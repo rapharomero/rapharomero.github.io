@@ -10,7 +10,7 @@ I work under the supervision of profesor Tijl De Bie on graph embedding and long
 
 Previously I worked one year as a Data Scientist at Shift Technology in Paris. Before that I completed a Msc in Mathematics, Computer Vision and Machine learning at ENS Paris-Saclay (former ENS Cachan), as well as a MEng at Telecom Paris.
 
-On this website I plan to post articles summarizing research ideas, as well as miscellaneous technical content. 
+On this website I plan to post articles summarizing research ideas, as well as miscellaneous technical content.
 
 <!--
 This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
