@@ -11,6 +11,8 @@ bibliography:
 date: February 2022
 ---
 
+<!--more-->
+
 # Introduction
 
 Conditional Network Embedding (CNE) {% cite KangLB19 %} is a node embedding method for graphs that has been successfully applied to visualization and prediction. It allows the user to generate node embeddings that respect the network structure, while factoring out prior knowledge known in advance. Applications of this include visualizing the nodes in a network without representing undesired effect, such as for instance having the high degree nodes concentrated in the center of the embedding space. The resulting embeddings can also be used to predict links while controlling the influence of sensitive node attributes on the predictions. This has great interest in producing fair link prediction on social networks, such as in {% cite buyl20a %}.

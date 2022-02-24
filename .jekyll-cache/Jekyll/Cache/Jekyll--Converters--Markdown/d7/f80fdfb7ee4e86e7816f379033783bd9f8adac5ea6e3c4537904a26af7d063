@@ -1,0 +1,162 @@
+I"�,<!--more-->
+
+<p>$\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\R}{\mathbb{R}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$</p>
+
+<p>In this post, we explain Maximum Entropy models for graphs, as presented in previous work <a class="citation" href="#debie2010maximum">(Bie, 2010)</a> and <a class="citation" href="#adriaens">(Adriaens et al., 2017)</a>, and how they can be used to derive prior distributions on graphs.</p>
+
+<h3 id="introduction">Introduction</h3>
+
+<p>Many real-world phenomena can be (at least partially) described in the form of networks. Examples include social networks, user behavior online, neurons in the brain, ecological networks etc…</p>
+
+<p>Before any real-world network is observed, the observer generally has prior expectations about the properties of this graph, depending on its nature.</p>
+
+<p>For instance, one might have an idea of the number of links, the number of links <em>per node</em> (their degree).</p>
+
+<p>In a social network, one might have prior expectations about the number of links connecting any two communities. Indeed, the fact that people from the same community tend to connect more than from different ones is a fact commonly observed in real-world social networks and often quoted as <em>homophily</em>.</p>
+
+<h1 id="formalizing-prior-expectations">Formalizing prior expectations</h1>
+
+<h4 id="notations">Notations</h4>
+
+<p>Let $U$ a set of nodes. A graph is a tuple $G=(U, E)$ where $E\subset U \times U$ is the set of edges of the graph. For a fixed set of nodes $U$, we denote by $\Gcal$ the set of possible undirected graphs connecting the nodes in $U$. Each graph $G\in\Gcal$ can be fully described by its adjacency matrix: $A=(a_{ij})\in \{0,1\}^{n^2}$, such that $a_{ij}=1$ if and only if the nodes $i$ and $j$ are connected. For each node $i \in U$, we denote $\mathcal{N}(i)$ its set of neighbors.</p>
+
+<h4 id="prior-statistics">Prior statistics</h4>
+
+<p>Prior expectations about a grpah can be expressed or modelled as <em>statistics</em>, which are defined as measurable functions taking as input a graph and yielding a real number:</p>
+
+<p>$$
+\begin{aligned}
+f&amp;: &amp;G  &amp;\mapsto&amp; &amp;f(G)  \\ &amp;&amp;\Gcal &amp;\rightarrow&amp; &amp;\R<br />
+\end{aligned}
+$$</p>
+
+<p>Examples of such statistics include:</p>
+
+<ul>
+  <li>The degree of each node $i$: $$f_i^{(degree)}(G) = \sum\limits_{j\in \cal{N}(i)} a_{ij}$$</li>
+  <li>The number of connections between two node subsets $W, W’ \subset U$: $$f_{W,W’}^{(block)}(G) = \sum\limits_{i,j \in W \times W’} a_{ij}$$</li>
+</ul>
+
+<!--
+\$\$
+f: G\in \Gcal \mapsto f(G) \in \R*+
+\Gcal \rightarrow \R*+
+\$\$ -->
+
+<h1 id="maximum-entropy-models">Maximum Entropy models</h1>
+
+<p>Supposing that we encode our prior expectations into $K$ statistics $f_1,…,f_K$ where each $f_k$ is a real-valued graph function, then the maximum entropy principle can be used to convert those into a <em>prior distribution</em> on the set of possible graphs.</p>
+
+<h4 id="graph-distributions">Graph distributions</h4>
+
+<p>A <em>graph distribution</em> is a probability distribution defined on the set of graphs $\Gcal$. In other words, it can be identified witha function $P$ that gives for each graph $G \in \Gcal$ the likelihood $P(G)$ of observing this particular graph</p>
+
+<h4 id="entropy-of-a-graph-distribution">Entropy of a graph distribution.</h4>
+
+<p>The <em>entropy value</em> of any distribution $P$ being defined as $$H(P) = -\sum_{G\in\Gcal} P(G)\log(P(G))$$</p>
+
+<p>This quantity measures the average amount of information provided by the observation of a graph, under the distribution $P$.</p>
+
+<!-- Under this principle, we want to find a distribution on the set of possible graphs $\Gcal$, that has maximum entropy value, -->
+
+<h4 id="expected-value-of-the-prior-statistics">Expected value of the prior statistics</h4>
+
+<p>$\newcommand{\Ebb}{\mathbb{E}}$ For a given graph distribution $P$, and a graph statistic $f$, one can define the expectation of this graph statistic as: $$\Ebb[f(G)]= \sum_{G\in \Gcal} f(G)P(G)$$</p>
+
+<h4 id="maximizing-the-entropy-under-statistics-based-constraints">Maximizing the entropy under statistics-based constraints</h4>
+
+<p>Supposing that we encode our prior expectations into $K$ statistics $f_1,…,f_K$ where each $f_k$ is a real-valued graph function, then the maximum entropy principle can be used to derive a resulting <em>prior distribution</em> on the set of possible graphs.</p>
+
+<p>While prior expectations about the graph are provided in the form of graph statistics value, we would like to define a distribution over the set of graphs, such that the expected value of the statistics under this distribtution are equal to the one that we expect. In other words we want to impose <em>soft constraints</em> on the graph distribution.</p>
+
+<p>Namely, we want our distribution to satisfy for all $k=1,…,K$: $$\Ebb[f(G)]= c_k$$</p>
+
+<p>Where $c_k$ is our prior expectation value for the statistic $k$. Under these constraints, we use the Maximum Entropy principle to define a prior distribution over the set of graphs such that the obtained distribution <strong>provides as least information</strong> as possible, in addition to satisfying the statistic constraints.</p>
+
+<p>Achieving this amounts in solving the Maximum Entropy constrained optimization problem:</p>
+
+<!-- % \left\{ -->
+
+<p>$$
+\begin{array}{cc}
+\max\limits_{P} &amp; H(P) \\ \text{such that}  &amp;\Ebb[f(G)]= c_k , k=1,…,K\\ &amp;\sum_{G\in\Gcal}P(G)=1
+\end{array}
+$$</p>
+
+<!-- % \right./ -->
+
+<p>It can be shown that the maximum entropy distribution can be written, for a certain parameter vector $\lambda \in \mathbb{R}^K$ and each graph $G\in \mathcal{G}$:</p>
+
+<p>$$
+P^*_{\lambda}(G) =
+\frac{
+\exp(\lambda^T f(G))
+}{
+\sum_{G \in \mathcal{G}}\exp(\lambda^T f(G))
+}
+$$</p>
+
+<p>Where $f(G)=(f_1(G), …, f_K(G))$ is the vector of graph statistics.</p>
+
+<h4 id="link-with-maximum-likelihood-estimation">Link with Maximum Likelihood Estimation</h4>
+
+<p>There is a strong connection between the above Maximum Entropy problem and Maximum Likelihood estimation. First we note that these two problems are distinct: while the first is a variational optimization problem (the optimization variable is the probability distribution $P$), the second is an simple convex optimization problem where the optimization variable is the parameter vector $\lambda$.</p>
+
+<p>Their common point is that they are dual problems from each other. Indeed, for any distribution $P$ the Lagrangian associated with the MaxEnt Problem writes:</p>
+
+<p>$$
+\begin{aligned}
+\mathcal{L}(P, \lambda)
+=&amp;-\sum\limits_{G \in \mathcal{G}} P(G) log(P(G))\\ &amp;- \sum\limits_{k=1}^{K} \lambda_k (\sum\limits_{G \in \mathcal{G}} P(G)  f_k(G) -  c_k )
+\end{aligned}
+$$</p>
+
+<p>$\newcommand{\Lcal}{\mathcal{L}}$ $\newcommand{\Ghat}{\hat{G}}$ $\newcommand{\Pstar}{P^*_{\lambda}}$</p>
+
+<p>In the context of statistics where we observe a graph $\Ghat$ and set $c_k=f_k(\Ghat)$ for all the statistics $k=1,…,K$, it can be easily shown that</p>
+
+<p>$$\Lcal(\Pstar, \lambda) = -\log(\Pstar(\Ghat)).$$ Hence the Lagrangian is exactly equal to the negative log-likelihood of the model.</p>
+
+<h3 id="factorized-form">Factorized form</h3>
+
+<p>A broad range of graph statistics can be decomposed as of edge-specific statistics, i.e.: $\newcommand{\fijk}{f_{ij}^{(k)}}$ $$f_k(G)= \sum\limits_{i \neq j} \fijk(a_{ij}),$$</p>
+
+<p>For instance, the degree of a node is equal to the sum of the corresponding row of the adjacency matrix, and the volume of interaction between two communities is the sum of the entries located in a block of the adjacency matrix.</p>
+
+<p>It can be shown that for these statistics the MaxEnt distribution factorizes over the set of edges. More precisely, in that case we can derive edge-specific statistic vectors, denoted $f_{ij}(G)$, such that:</p>
+
+<p>$$\Pstar(G)=\prod\limits_{i\neq j} P_{ij}(a_{ij})$$ Where for each edge $ij$, $P_{ij}$ is a Bernoulli probability with parameter $$\frac{1}{1+exp(-\lambda^T f_{i,j}(G))}$$ This expression allows to express the graph distribution as a joint distribution of independent edge-specific Bernoulli variables $a_{ij}$. Moreover, the Bernoulli probabilities for each edge are given by a linear logit $\lambda^T f_{i,j}(G)$, passed through the sigmoid function $\sigma :x\mapsto \frac{1}{1+exp(-x)}$.</p>
+
+<h3 id="how-to-turn-prior-knowledge-statistics-into-a-maxent-distribution">How to turn prior knowledge statistics into a MaxEnt distribution</h3>
+
+<p>In practice, such a distribution can used to extract prior information from an observed graph $\hat{G}$. We recall that the input of this procedure is a set of graph statistic functions, that each quantify an aspect of our expectation on the graph distribution. Based on this, one can apply the statistics $f_k$ to the observed graph, and use the obtained values To do this, one just needs to maximize the above likelihood of the observed graph with respect to the parameter vector $\lambda$:</p>
+
+<p>$$
+\begin{aligned}
+\max\limits_{\lambda\in \mathbb{R}^K} P(\hat{G}) <br />
+\end{aligned}
+$$</p>
+
+<p>It can be noted that this Maximum Likelihood problem can be solved using logistic regression. Indeed, for each each edge, we access a feature vector $f_{i,j}(\hat{G})$ use it to predict the presence of absence or link between nodes $i$ and $j$.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>We have seen how Maximum Entropy models for graph can be used to formalize prior knowledge about a graph, encoded as soft constraints.</p>
+
+<p>The resulting model has been widely studied in network science literature, under the name of P* (p-star) model, or Exponential random graph models. I</p>
+
+<p>The dyad-independent expression has served as the basis of Later work such as Conditional Network Embeddings <a class="citation" href="#KangLB19">(Kang et al., 2019)</a>.</p>
+
+<h2 id="references">References</h2>
+
+<ol class="bibliography"><li><span id="debie2010maximum">Bie, T. D. (2010). <i>Maximum entropy models and subjective interestingness: an application to tiles in binary databases</i>.</span></li>
+<li><span id="adriaens">Adriaens, F., Lijffijt, J., &amp; De Bie, T. (2017). Subjectively interesting connecting trees. In M. Ceci, J. Hollmén, L. Todorovski, &amp; C. Vens (Eds.), <i>Machine Learning and Knowledge Discovery in Databases: European Conference, ECML PKDD 2017, Skopje, Macedonia, September 18–22, 2017, Proceedings, Part II</i> (Vol. 10535, Number 2, pp. 53–69). Springer International Publishing. http://dx.doi.org/10.1007/978-3-319-71246-8_4</span></li>
+<li><span id="KangLB19">Kang, B., Lijffijt, J., &amp; Bie, T. D. (2019). Conditional Network Embeddings. <i>7th International Conference on Learning Representations, ICLR 2019,
+               New Orleans, LA, USA, May 6-9, 2019</i>. https://openreview.net/forum?id=ryepUj0qtX</span></li></ol>
+
+<!-- In this paragraph, we have seen how MaxEnt model allow us to encode prior knowledge into a graph distribution $P(G)$ and for a certain type of statistics this translates into a set of independent bernoulli variables with proabilities $P_{ij}(a_{ij})=\sigma(\lambda^Tf_{ij}(G))$.
+Now we will see how, once we have derived such a MaxEnt distribution, we can use it to find embeddings conditional on this distribution.
+
+\$\$
+\$\$ -->
+:ET
