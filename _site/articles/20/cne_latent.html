@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Conditional Network Embedding, a Latent Space Distance perspective</title>
-  <meta name="description" content="">
+  <meta name="description" content="In this article I summarize the Conditional Network Embedding model, and underline its connection with the broader class of Latent Space Distance models for ...">
 
   <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
   
@@ -16,36 +16,33 @@
   
   <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
   
-    <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    extensions: [
-      "MathMenu.js",
-      "MathZoom.js",
-      "AssistiveMML.js",
-      "a11y/accessibility-menu.js"
-    ],
-    jax: ["input/TeX", "output/CommonHTML"],
-    TeX: {
-      extensions: [
-        "AMSmath.js",
-        "AMSsymbols.js",
-        "noErrors.js",
-        "noUndefined.js",
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <script>
+    let options = {
+      delimiters: [
+        { left: "$", right: "$", display: false },
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
       ]
     }
-  });
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, options);
+    });
+
 </script>
 
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
- <!--   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
   
+
 
   <link rel="stylesheet" type="text/css" href="/css/tufte.css">
   <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
 
-  <link rel="canonical" href="/articles/22/cne_latent">
+  <link rel="canonical" href="/articles/20/cne_latent">
 
   <link rel="alternate" type="application/rss+xml" title="Raphaël's research website" href="/feed.xml">
 <script>MathJax={"tex":{"inlineMath":[["$","$"],["\\(","\\)"]],"displayMath":[["$$","$$"],["\\[","\\]"]]},"svg":{"fontCache":"global"}}</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -83,7 +80,9 @@
 </header>
     <article class="group">
       <h1>Conditional Network Embedding, a Latent Space Distance perspective</h1>
-<p class="subtitle">February 1, 2022</p>
+<p class="subtitle">November 1, 2020</p>
+
+<p>In this article I summarize the Conditional Network Embedding model, and underline its connection with the broader class of Latent Space Distance models for graphs.</p>
 
 <!--more-->
 
@@ -272,6 +271,10 @@ As can be seen, each embedding $z_i$ is endowed with a disk $D_i$of radius $\alp
 
 If the prior similarity is high, the the disk need not be too close for the connection to form. As a consequence, the embeddings will not encode the prior information. -->
 
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We have seen that write the posterior distribution of CNE as a product of Bernoulli distributions, and looking for the Bernoulli parameters allow us to express the CNE model as a Latent Space model for graphs. Such an observation is useful to analyze the theoretical properties (consistency, convergence bounds) of the models, as well as to generalize the approach to different types of graphs (weighted, temporal graphs for instance).</p>
+
 <h2 id="references">References</h2>
 
 <ol class="bibliography">
@@ -287,7 +290,7 @@ If the prior similarity is high, the the disk need not be too close for the conn
 
 
     </article>
-    <span class="print-footer">Conditional Network Embedding, a Latent Space Distance perspective - February 1, 2022 - clay harmon</span>
+    <span class="print-footer">Conditional Network Embedding, a Latent Space Distance perspective - November 1, 2020 - clay harmon</span>
     <footer>
   <hr class="slender">
   <ul class="footer-links">

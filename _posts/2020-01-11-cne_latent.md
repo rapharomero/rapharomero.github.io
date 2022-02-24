@@ -8,8 +8,10 @@ author:
   - Raphaël Romero
 bibliography:
   - bibtex.bib
-date: February 2022
+date: November 2020
 ---
+
+In this article I summarize the Conditional Network Embedding model, and underline its connection with the broader class of Latent Space Distance models for graphs.
 
 <!--more-->
 
@@ -40,7 +42,7 @@ $$
 
 # Factoring out prior information in embeddings
 
-$\newcommand{\norm}[1]{\vert \vert #1 \vert \vert }$ In CNE, we suppose that we have encoded our prior expectations about an observed graph $\hat{G}$ into a MaxEnt distribution(see [my post about Maxent]({{site.url}}/{% post_url 2022-11-02-maxent %}) or the paper {% cite debie2010maximum %}). Moreover, we suppose that each node $i \in U$ is represented by an (unknown) embedding vector $z_i \in \mathbb{R}^d$, and that for two nodes $i \neq j$, their connection only depends on the embedding through the euclidean distance between their embeddings $d\_{ij} = \norm{z_i-z_j}$.
+$\newcommand{\norm}[1]{\vert \vert #1 \vert \vert }$ In CNE, we suppose that we have encoded our prior expectations about an observed graph $\hat{G}$ into a MaxEnt distribution(see [my post about Maxent]({{site.url}}/{% post_url 2020-01-10-maxent %}) or the paper {% cite debie2010maximum %}). Moreover, we suppose that each node $i \in U$ is represented by an (unknown) embedding vector $z_i \in \mathbb{R}^d$, and that for two nodes $i \neq j$, their connection only depends on the embedding through the euclidean distance between their embeddings $d\_{ij} = \norm{z_i-z_j}$.
 
 Based on that, CNE uses Bayes' rule to define the link probability conditioned on the MaxEnt distribution:
 
@@ -188,6 +190,10 @@ This has a natural visual interpretation, as shown in the following image
 As can be seen, each embedding $z_i$ is endowed with a disk $D_i$of radius $\alpha_i+\gamma$ such that the minimum distance between $D_i$ and $D_j$ in order for the nodes to connect is $\theta^T x_{ij}$.
 
 If the prior similarity is high, the the disk need not be too close for the connection to form. As a consequence, the embeddings will not encode the prior information. -->
+
+## Conclusion
+
+We have seen that write the posterior distribution of CNE as a product of Bernoulli distributions, and looking for the Bernoulli parameters allow us to express the CNE model as a Latent Space model for graphs. Such an observation is useful to analyze the theoretical properties (consistency, convergence bounds) of the models, as well as to generalize the approach to different types of graphs (weighted, temporal graphs for instance).
 
 ## References
 

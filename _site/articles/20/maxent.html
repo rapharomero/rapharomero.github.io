@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Maximum Entropy (MaxEnt) models for Graphs</title>
-  <meta name="description" content="">
+  <meta name="description" content="In this post, we explain Maximum Entropy models for graphs, as presented in previous work (Bie, 2010) and (Adriaens et al., 2017), and how they can be used t...">
 
   <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
   
@@ -16,31 +16,28 @@
   
   <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
   
-    <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    extensions: [
-      "MathMenu.js",
-      "MathZoom.js",
-      "AssistiveMML.js",
-      "a11y/accessibility-menu.js"
-    ],
-    jax: ["input/TeX", "output/CommonHTML"],
-    TeX: {
-      extensions: [
-        "AMSmath.js",
-        "AMSsymbols.js",
-        "noErrors.js",
-        "noUndefined.js",
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <script>
+    let options = {
+      delimiters: [
+        { left: "$", right: "$", display: false },
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
       ]
     }
-  });
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, options);
+    });
+
 </script>
 
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
- <!--   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
   
+
 
   <link rel="stylesheet" type="text/css" href="/css/tufte.css">
   <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
@@ -85,11 +82,9 @@
       <h1>Maximum Entropy (MaxEnt) models for Graphs</h1>
 <p class="subtitle">October 1, 2020</p>
 
-<!--more-->
-
-<p>$\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\R}{\mathbb{R}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$</p>
-
 <p>In this post, we explain Maximum Entropy models for graphs, as presented in previous work <a class="citation" href="#debie2010maximum">(Bie, 2010)</a> and <a class="citation" href="#adriaens">(Adriaens et al., 2017)</a>, and how they can be used to derive prior distributions on graphs.</p>
+
+<!--more-->
 
 <h3 id="introduction">Introduction</h3>
 
@@ -103,11 +98,13 @@
 
 <h1 id="formalizing-prior-expectations">Formalizing prior expectations</h1>
 
-<h4 id="notations">Notations</h4>
+<p>$\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\R}{\mathbb{R}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$</p>
+
+<h2 id="notations">Notations</h2>
 
 <p>Let $U$ a set of nodes. A graph is a tuple $G=(U, E)$ where $E\subset U \times U$ is the set of edges of the graph. For a fixed set of nodes $U$, we denote by $\Gcal$ the set of possible undirected graphs connecting the nodes in $U$. Each graph $G\in\Gcal$ can be fully described by its adjacency matrix: $A=(a_{ij})\in \{0,1\}^{n^2}$, such that $a_{ij}=1$ if and only if the nodes $i$ and $j$ are connected. For each node $i \in U$, we denote $\mathcal{N}(i)$ its set of neighbors.</p>
 
-<h4 id="prior-statistics">Prior statistics</h4>
+<h2 id="prior-statistics">Prior statistics</h2>
 
 <p>Prior expectations about a grpah can be expressed or modelled as <em>statistics</em>, which are defined as measurable functions taking as input a graph and yielding a real number:</p>
 
@@ -134,11 +131,11 @@ f: G\in \Gcal \mapsto f(G) \in \R*+
 
 <p>Supposing that we encode our prior expectations into $K$ statistics $f_1,…,f_K$ where each $f_k$ is a real-valued graph function, then the maximum entropy principle can be used to convert those into a <em>prior distribution</em> on the set of possible graphs.</p>
 
-<h4 id="graph-distributions">Graph distributions</h4>
+<h2 id="graph-distributions">Graph distributions</h2>
 
 <p>A <em>graph distribution</em> is a probability distribution defined on the set of graphs $\Gcal$. In other words, it can be identified witha function $P$ that gives for each graph $G \in \Gcal$ the likelihood $P(G)$ of observing this particular graph</p>
 
-<h4 id="entropy-of-a-graph-distribution">Entropy of a graph distribution.</h4>
+<h2 id="entropy-of-a-graph-distribution">Entropy of a graph distribution.</h2>
 
 <p>The <em>entropy value</em> of any distribution $P$ being defined as $$H(P) = -\sum_{G\in\Gcal} P(G)\log(P(G))$$</p>
 
@@ -146,11 +143,11 @@ f: G\in \Gcal \mapsto f(G) \in \R*+
 
 <!-- Under this principle, we want to find a distribution on the set of possible graphs $\Gcal$, that has maximum entropy value, -->
 
-<h4 id="expected-value-of-the-prior-statistics">Expected value of the prior statistics</h4>
+<h2 id="expected-value-of-the-prior-statistics">Expected value of the prior statistics</h2>
 
 <p>$\newcommand{\Ebb}{\mathbb{E}}$ For a given graph distribution $P$, and a graph statistic $f$, one can define the expectation of this graph statistic as: $$\Ebb[f(G)]= \sum_{G\in \Gcal} f(G)P(G)$$</p>
 
-<h4 id="maximizing-the-entropy-under-statistics-based-constraints">Maximizing the entropy under statistics-based constraints</h4>
+<h2 id="maximizing-the-entropy-under-statistics-based-constraints">Maximizing the entropy under statistics-based constraints</h2>
 
 <p>Supposing that we encode our prior expectations into $K$ statistics $f_1,…,f_K$ where each $f_k$ is a real-valued graph function, then the maximum entropy principle can be used to derive a resulting <em>prior distribution</em> on the set of possible graphs.</p>
 
@@ -185,7 +182,7 @@ $$</p>
 
 <p>Where $f(G)=(f_1(G), …, f_K(G))$ is the vector of graph statistics.</p>
 
-<h4 id="link-with-maximum-likelihood-estimation">Link with Maximum Likelihood Estimation</h4>
+<h2 id="link-with-maximum-likelihood-estimation">Link with Maximum Likelihood Estimation</h2>
 
 <p>There is a strong connection between the above Maximum Entropy problem and Maximum Likelihood estimation. First we note that these two problems are distinct: while the first is a variational optimization problem (the optimization variable is the probability distribution $P$), the second is an simple convex optimization problem where the optimization variable is the parameter vector $\lambda$.</p>
 
@@ -204,7 +201,7 @@ $$</p>
 
 <p>$$\Lcal(\Pstar, \lambda) = -\log(\Pstar(\Ghat)).$$ Hence the Lagrangian is exactly equal to the negative log-likelihood of the model.</p>
 
-<h3 id="factorized-form">Factorized form</h3>
+<h2 id="factorized-form">Factorized form</h2>
 
 <p>A broad range of graph statistics can be decomposed as of edge-specific statistics, i.e.: $\newcommand{\fijk}{f_{ij}^{(k)}}$ $$f_k(G)= \sum\limits_{i \neq j} \fijk(a_{ij}),$$</p>
 
@@ -214,7 +211,7 @@ $$</p>
 
 <p>$$\Pstar(G)=\prod\limits_{i\neq j} P_{ij}(a_{ij})$$ Where for each edge $ij$, $P_{ij}$ is a Bernoulli probability with parameter $$\frac{1}{1+exp(-\lambda^T f_{i,j}(G))}$$ This expression allows to express the graph distribution as a joint distribution of independent edge-specific Bernoulli variables $a_{ij}$. Moreover, the Bernoulli probabilities for each edge are given by a linear logit $\lambda^T f_{i,j}(G)$, passed through the sigmoid function $\sigma :x\mapsto \frac{1}{1+exp(-x)}$.</p>
 
-<h3 id="how-to-turn-prior-knowledge-statistics-into-a-maxent-distribution">How to turn prior knowledge statistics into a MaxEnt distribution</h3>
+<h2 id="maxent-in-practice-how-to-turn-prior-knowledge-statistics-into-a-maxent-distribution">MaxEnt in practice: how to turn prior knowledge statistics into a MaxEnt distribution</h2>
 
 <p>In practice, such a distribution can used to extract prior information from an observed graph $\hat{G}$. We recall that the input of this procedure is a set of graph statistic functions, that each quantify an aspect of our expectation on the graph distribution. Based on this, one can apply the statistics $f_k$ to the observed graph, and use the obtained values To do this, one just needs to maximize the above likelihood of the observed graph with respect to the parameter vector $\lambda$:</p>
 
@@ -226,7 +223,7 @@ $$</p>
 
 <p>It can be noted that this Maximum Likelihood problem can be solved using logistic regression. Indeed, for each each edge, we access a feature vector $f_{i,j}(\hat{G})$ use it to predict the presence of absence or link between nodes $i$ and $j$.</p>
 
-<h3 id="conclusion">Conclusion</h3>
+<h2 id="conclusion">Conclusion</h2>
 
 <p>We have seen how Maximum Entropy models for graph can be used to formalize prior knowledge about a graph, encoded as soft constraints.</p>
 

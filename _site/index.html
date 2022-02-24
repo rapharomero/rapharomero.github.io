@@ -16,31 +16,28 @@
   
   <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
   
-    <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    extensions: [
-      "MathMenu.js",
-      "MathZoom.js",
-      "AssistiveMML.js",
-      "a11y/accessibility-menu.js"
-    ],
-    jax: ["input/TeX", "output/CommonHTML"],
-    TeX: {
-      extensions: [
-        "AMSmath.js",
-        "AMSsymbols.js",
-        "noErrors.js",
-        "noUndefined.js",
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <script>
+    let options = {
+      delimiters: [
+        { left: "$", right: "$", display: false },
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
       ]
     }
-  });
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, options);
+    });
+
 </script>
 
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
- <!--   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
   
+
 
   <link rel="stylesheet" type="text/css" href="/css/tufte.css">
   <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
@@ -81,7 +78,8 @@
 	</nav>
 </header>
     <article>
-      
+      <p>Welcome to my personal page! I’m Raphaël Romero, a PhD student in computer science and statistics, in the <a href="https://aida.ugent.be/">AIDA group</a> of Ghent University and IDlab. On this website I post articles summarizing research ideas, as well as miscellaneous technical content.</p>
+
 
 <h1 class="content-listing-header sans">Articles</h1>
 <ul class="content-listing ">
@@ -93,16 +91,20 @@
         </a>
         <br><span class="smaller">February 1, 2022</span> <br>
         <div>
+<p>In this article I give a visualization of latent space distance models for graphs, and how they allow to disantangle the metric structure of the graph from prior information such as node/edge attributes.</p>
+
 </div>
     </li>
     
     <li class="listing">
         <hr class="slender">
-        <a href="/articles/22/cne_latent">
+        <a href="/articles/20/cne_latent">
             <h3 class="contrast">Conditional Network Embedding, a Latent Space Distance perspective</h3>
         </a>
-        <br><span class="smaller">February 1, 2022</span> <br>
+        <br><span class="smaller">November 1, 2020</span> <br>
         <div>
+<p>In this article I summarize the Conditional Network Embedding model, and underline its connection with the broader class of Latent Space Distance models for graphs.</p>
+
 </div>
     </li>
     
@@ -113,30 +115,8 @@
         </a>
         <br><span class="smaller">October 1, 2020</span> <br>
         <div>
-</div>
-    </li>
-    
-    <li class="listing">
-        <hr class="slender">
-        <a href="/articles/20/Edge-Cases">
-            <h3 class="contrast">Edge Cases</h3>
-        </a>
-        <br><span class="smaller">April 13, 2020</span> <br>
-        <div>
-<p>Some edge cases and cautionary examples on using Markdown for writing content using this theme. In particular, list syntax can really knot things up.
-</p>
-</div>
-    </li>
-    
-    <li class="listing">
-        <hr class="slender">
-        <a href="/articles/20/tufte-style-jekyll-blog">
-            <h3 class="contrast">Tufte-style Jekyll blog</h3>
-        </a>
-        <br><span class="smaller">April 13, 2020</span> <br>
-        <div>
-<p><span class="newthought">The Tufte Jekyll theme</span>  is an attempt to create a website design with the look and feel of Edward Tufte’s books and handouts. Tufte’s style is known for its extensive use of sidenotes, tight integration of graphics with text, and well-set typography.
-</p>
+<p>In this post, we explain Maximum Entropy models for graphs, as presented in previous work <a class="citation" href="#debie2010maximum">(Bie, 2010)</a> and <a class="citation" href="#adriaens">(Adriaens et al., 2017)</a>, and how they can be used to derive prior distributions on graphs.</p>
+
 </div>
     </li>
     

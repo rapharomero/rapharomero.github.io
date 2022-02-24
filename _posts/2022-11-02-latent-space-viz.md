@@ -11,6 +11,8 @@ bibliography:
 date: February 2022
 ---
 
+In this article I give a visualization of latent space distance models for graphs, and how they allow to disantangle the metric structure of the graph from prior information such as node/edge attributes.
+
 <!--more-->
 
 # Introduction
@@ -40,7 +42,7 @@ Where $\alpha_i$ and $\alpha_j$ _sociality_ parameters, $x_{ij}$ are predefined 
 
 In order to geometrically explain how LSDMs disantangle, a possible approach is to make the (random) edge Bernoulli random variables, deterministic, by changing the link function. Indeed the sigmoid function is a smooth version of a non-continuous function, the Heaviside step function, given by $h(x) = \mathbb{1}_{\{x>0\}}$. This one yields an activation equal to 1 for positive inputs and 0 for negative inputs.
 
-{% maincolums %} ![Heaviside]({{site.url}}/asserts/img/sigmoid_vs_heaviside.png) _The heaviside function in red, and the sigmoid function in green_
+{% maincolumn "assets/img/sigmoid_vs_heaviside.png" "_The heaviside function in red, and the sigmoid function in green_" %}
 
 The deterministic graph is given by the following link indicators:
 
@@ -52,11 +54,13 @@ $$
 
 This one has a natural visual interpretation, as shown in the following image.
 
-As can be seen, each embedding $z_i$ is endowed with a disk $D_i$ of radius $\alpha_i+\gamma$ such that the minimum distance between $D_i$ and $D_j$ in order for the nodes to connect is $\lambda^T x_{ij}$. If a given node has a large disk, it will naturally form more connections, independent on the position of the disk center.
+{% maincolumn "assets/img/cne_deg1.png" "Disks associated with each node" %} As can be seen, each embedding $z_i$ is endowed with a disk $D_i$ of radius $\alpha_i+\gamma$ such that the minimum distance between $D_i$ and $D_j$ in order for the nodes to connect is $\lambda^T x_{ij}$. If a given node has a large disk, it will naturally form more connections, independent on the position of the disk center.
 
 Moreover the prior similarity between nodes $i$ and $j$ is high, then the disk need not be too close for the connection to form. As a consequence, the embeddings will not encode the prior information contained in the term $\lambda^T x_{ij}$.
 
-![CNE-DEG]({{site.url}}/asserts/img/cne_deg1.png)
+## Conclusion
+
+In this article we focus on latent space distance models, and provide a visual interpretation of the mechanism that allow these models to learn vector representation of nodes that do not encode information known in advance in the form of node and edge attributes.
 
 ## References
 
