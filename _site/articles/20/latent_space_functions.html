@@ -88,23 +88,23 @@
 
 <h1 id="introduction">Introduction</h1>
 
-<p>Latent Space models for graphs are defined such that the independent edge link probabilities are given by functions of the distance between some embeddings. $\newcommand{\norm}[1]{\vert\vert #1 \vert\vert}$</p>
+<p>Latent Space models for graphs are defined such that the independent edge link probabilities are given by functions of the distance between some embeddings. $\newcommand{\norm}[1]{\vert\vert #1 \vert\vert}$. Denoting $i,j$ some node indices, $z_i \in \mathbb{R}^d$ some node embeddings of dimension $d&gt;0$.</p>
 
 <p>$$
 \begin{align}
 \label{model}
-y_{ij} &amp;\sim Bernoulli(\theta_{ij}) \\ \theta_{ij} &amp;= \sigma(x_{ij}) \\  x_{ij} &amp;= \gamma- g(\norm{x_i - x_j}^2)
+y_{ij} &amp;\sim Bernoulli(\theta_{ij}) \\ \theta_{ij} &amp;= \sigma(x_{ij}) \\  x_{ij} &amp;= \gamma- g(\norm{z_i - z_j}^2)
 \end{align}
 $$</p>
 
-<p>where $\sigma$ is the sigmoid function .</p>
+<p>where $x_{ij}$ are the logits of the model, $\theta_{ij}$ are the edge link probabilities and  $\sigma$ is the sigmoid link function.</p>
 
 <p>The function g can be any non-decreasing, non-negative smooth function. For instance:</p>
 
 <ul>
-  <li>If g is the identity function: $x_{ij} = \gamma- \norm{x_i - x_j}^2$</li>
-  <li>If g is the square root function: $x_{ij} = \gamma- \norm{x_i - x_j}$</li>
-  <li>If g is the log: $x_{ij} = \gamma- 2\log(\norm{x_i - x_j})$</li>
+  <li>If g is the identity function: $x_{ij} = \gamma- \norm{z_i - z_j}^2$</li>
+  <li>If g is the square root function: $x_{ij} = \gamma- \norm{z_i - z_j}$</li>
+  <li>If g is the log: $x_{ij} = \gamma- 2\log(\norm{z_i - z_j})$</li>
 </ul>
 
 <p>We would like to investigate the impact on this distance function on the embeddings found by performing Maximum Likelihood Estimation of the model, given an observed graph.</p>
@@ -125,7 +125,7 @@ $$</p>
 
 <p>This one is given by:</p>
 
-<p>$$\nabla_{z_i}L(z) = \sum_{j\neq i} (\nabla_{z_i}x_{ij}) (a_{ij} - \sigma(x_{ij}))$$</p>
+<p>$$\nabla_{z_i}L(z) = \sum_{j\neq i} (\nabla_{z_i}x_{ij}) (y_{ij} - \sigma(x_{ij}))$$</p>
 
 <p>Moreover, using the chain rule gives us the gradient of the logit $x_{ij}$ with respect to the embeddings:</p>
 
@@ -133,15 +133,79 @@ $$</p>
 
 <p>So finally we get the following gradient:</p>
 
-<p>$$\nabla_{z_i}L(z) = \sum_{j\neq i} -2(z_i - z_j) g’(\norm{z_i-z_j}^2) (a_{ij} - \sigma(x_{ij}))$$</p>
+<p>$$\nabla_{z_i}L(z) = \sum_{j\neq i} 2(z_i - z_j) g’(\norm{z_i-z_j}^2) (y_{ij} - \sigma(x_{ij}))$$</p>
 
 <h1 id="interpretation-in-terms-of-forces">Interpretation in terms of forces</h1>
 
 <p>As we see in the previous expression, the gradients with respect to the embeddings can be view as a set of forces pulling or repulsing the embeddings away from each other depending on whether the corresponding nodes are linked in the graph or not.</p>
 
 <ul>
-  <li>If the nodes $i$ and $j$ are connected, we get $$a_{ij} - \sigma(x_{ij}) = 1 - \sigma(x_{ij}) = \frac{1}{1+\exp(x_{ij})}$$</li>
+  <li>If the nodes $i$ and $j$ are connected (i.e. $y_{ij}=1$), we get :
+$$y_{ij} - \sigma(x_{ij}) = 1 - \sigma(x_{ij}) = \frac{1}{1+\exp(x_{ij})}&gt;0.$$
+So the associate gradient term will be the following <em>attractive force</em>
+$$
+\begin{aligned} 
+\vec{f_{ij}^{+}} &amp;= 2(z_i - z_j) g’(\norm{z_i-z_j}^2) (y_{ij} - \sigma(x_{ij})) \\ &amp;= (z_i - z_j) (\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(x_{ij})})
+\end{aligned}
+$$
+Indeed, since $g$ is non-decreasing we have $\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(x_{ij})} &gt;=0$, so this vector is oriented from the embedding $z_j$ to the embedding $z_i$, hence the term “attractive”.
+Later, we might be interested in how the intensity of this force scales with the distance between embeddings.</li>
+  <li>If the nodes $i$ and $j$ are not connected, we have $y_{ij} - \sigma(x_{ij}) = -\sigma(x_{ij})$ the embeddings are connected by the following $repulsive force$ (essentially pushing away $z_j$ from $z_i$): 
+$$
+\begin{aligned} 
+\vec{f_{ij}^{-}} = - (z_i - z_j) (\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(-x_{ij})})
+\end{aligned}
+$$</li>
 </ul>
+
+<p>Denoting the <em>sign</em> variable $s_{ij} = 1$ if $y_{ij}=1$ and $s_{ij} = -1$ if $y_{ij}=0$, we get the following compact formula for this force term:
+$$
+  \begin{aligned} 
+  \vec{f_{ij}} = s_{ij} (z_i - z_j) (\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(s_{ij} x_{ij})})
+  \end{aligned}
+  $$</p>
+
+<h1 id="examples">Examples</h1>
+
+<p>Using different distance functions, we can derive the attractive and repulsive forces to have an idea of their intensity.</p>
+
+<h3 id="identity-distance-function">Identity distance function</h3>
+<p>In the case where $g$ is simply the identity function, we get a signed force equal to 
+$$\vec{f_{ij}} =  s_{ij}(z_i-z_j)\frac{2}{1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2))}$$
+Thus, in that case the norm of the force is given by</p>
+
+<p>$$\norm{\vec{f_{ij}}} = \frac{2\norm{z_i-z_j}}{1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2))}$$</p>
+
+<ul>
+  <li>For positive edges ($s_{ij}=1$), this force reaches its minimum when the embeddings match, and will tend to infinity exponentially in the squared distance between embeddings:
+$$\norm{\vec{f_{ij}}} \sim 2\norm{z_i-z_j}exp(\norm{z_i-z_j}^2)$$ when $\norm{z_i-z_j} \rightarrow +\infty$.</li>
+  <li>For negative edges ($s_{ij}=-1$), this force becomes decreasing in the distance, and tends to $0$ when $\norm{z_i-z_j} \rightarrow +\infty$.</li>
+</ul>
+
+<h3 id="square-root-distance-functions">Square root distance functions</h3>
+<p>If $g$ is the squared root function, we get a signed force equal to 
+$$\vec{f_{ij}} =  \frac{s_{ij}(z_i-z_j)}{\norm{z_i - z_j}(1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2)))}$$</p>
+
+<p>The norm of this force term writes:
+$$\norm{\vec{f_{ij}}} = \frac{2}{1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2))}$$<br>
+This has the following assymptotic behavior:</p>
+<ul>
+  <li>when $\norm{z_i-z_j} \rightarrow +\infty$.</li>
+</ul>
+
+<h3 id="log-distance-functions">Log distance functions</h3>
+<p>If $g$ is the log, we get 
+$$\vec{f_{ij}} =  \frac{2s_{ij}(z_i-z_j)}{\norm{z_i - z_j}^2(1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}
+^2)))}$$</p>
+
+<p>In that case, the norm of the force is</p>
+
+<p>$$\norm{\vec{f_{ij}}} = \frac{2}{\norm{z_i - z_j}(1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}
+^2)))}$$</p>
+
+<p>For both positive and negative edges, this one tends to $+\infty$ when the distance tends to $0$</p>
+
+<p>We see that the first order derivative of the distance function has an impact on the type of force</p>
 
 <ol class="bibliography"></ol>
 
