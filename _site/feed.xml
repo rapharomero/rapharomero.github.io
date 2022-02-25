@@ -5,9 +5,20 @@
     <description></description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 24 Feb 2022 10:04:07 -0500</pubDate>
-    <lastBuildDate>Thu, 24 Feb 2022 10:04:07 -0500</lastBuildDate>
+    <pubDate>Fri, 25 Feb 2022 10:55:08 -0500</pubDate>
+    <lastBuildDate>Fri, 25 Feb 2022 10:55:08 -0500</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
+    
+      <item>
+        <title>A test draft</title>
+        <description>
+</description>
+        <pubDate>Fri, 25 Feb 2022 10:23:24 -0500</pubDate>
+        <link>/articles/22/a-test-draft</link>
+        <guid isPermaLink="true">/articles/22/a-test-draft</guid>
+        
+        
+      </item>
     
       <item>
         <title>A visualization of latent space distance models for Graphs</title>
@@ -454,6 +465,78 @@ Now we will see how, once we have derived such a MaxEnt distribution, we can use
         <pubDate>Thu, 01 Oct 2020 00:00:00 -0400</pubDate>
         <link>/articles/20/maxent</link>
         <guid isPermaLink="true">/articles/20/maxent</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Investigating Different distance function for Latent Distance graph models</title>
+        <description>&lt;p&gt;In this post, we consider Latent Space models for graphs, and investigate the impact of the distance function used on the embedding space.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;Latent Space models for graphs are defined such that the independent edge link probabilities are given by functions of the distance between some embeddings. $\newcommand{\norm}[1]{\vert\vert #1 \vert\vert}$&lt;/p&gt;
+
+&lt;p&gt;$$
+\begin{align}
+\label{model}
+y_{ij} &amp;amp;\sim Bernoulli(\theta_{ij}) \\ \theta_{ij} &amp;amp;= \sigma(x_{ij}) \\  x_{ij} &amp;amp;= \gamma- g(\norm{x_i - x_j}^2)
+\end{align}
+$$&lt;/p&gt;
+
+&lt;p&gt;where $\sigma$ is the sigmoid function .&lt;/p&gt;
+
+&lt;p&gt;The function g can be any non-decreasing, non-negative smooth function. For instance:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;If g is the identity function: $x_{ij} = \gamma- \norm{x_i - x_j}^2$&lt;/li&gt;
+  &lt;li&gt;If g is the square root function: $x_{ij} = \gamma- \norm{x_i - x_j}$&lt;/li&gt;
+  &lt;li&gt;If g is the log: $x_{ij} = \gamma- 2\log(\norm{x_i - x_j})$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We would like to investigate the impact on this distance function on the embeddings found by performing Maximum Likelihood Estimation of the model, given an observed graph.&lt;/p&gt;
+
+&lt;h1 id=&quot;likelihood-and-gradient-of-the-model&quot;&gt;Likelihood and gradient of the model&lt;/h1&gt;
+
+&lt;p&gt;The likelihood of a given observed undirected graph $\hat{G}$ with adjacency matrix $A={a_{ij}}$ is given by:&lt;/p&gt;
+
+&lt;p&gt;$$p(\hat{G}) = \prod\limits_{i&amp;lt;j} \theta_{ij}^{y_{ij}} (1-\theta_{ij})^{1-y_{ij}}$$&lt;/p&gt;
+
+&lt;p&gt;Hence we get the following negative log-likelihood, as a function of the embeddings $z_i$:&lt;/p&gt;
+
+&lt;p&gt;$$L(z) = \sum\limits_{i&amp;lt;j} log(1+ exp(x_{ij}))  - y_{ij} x_{ij}$$&lt;/p&gt;
+
+&lt;h1 id=&quot;gradient&quot;&gt;Gradient&lt;/h1&gt;
+
+&lt;p&gt;For a given node $i$, we compute the gradient of the loss function with respect to the embedding $z_i$.&lt;/p&gt;
+
+&lt;p&gt;This one is given by:&lt;/p&gt;
+
+&lt;p&gt;$$\nabla_{z_i}L(z) = \sum_{j\neq i} (\nabla_{z_i}x_{ij}) (a_{ij} - \sigma(x_{ij}))$$&lt;/p&gt;
+
+&lt;p&gt;Moreover, using the chain rule gives us the gradient of the logit $x_{ij}$ with respect to the embeddings:&lt;/p&gt;
+
+&lt;p&gt;$$\nabla_{z_i}x_{ij} = -2(z_i - z_j) g’(\norm{z_i-z_j}^2)$$&lt;/p&gt;
+
+&lt;p&gt;So finally we get the following gradient:&lt;/p&gt;
+
+&lt;p&gt;$$\nabla_{z_i}L(z) = \sum_{j\neq i} -2(z_i - z_j) g’(\norm{z_i-z_j}^2) (a_{ij} - \sigma(x_{ij}))$$&lt;/p&gt;
+
+&lt;h1 id=&quot;interpretation-in-terms-of-forces&quot;&gt;Interpretation in terms of forces&lt;/h1&gt;
+
+&lt;p&gt;As we see in the previous expression, the gradients with respect to the embeddings can be view as a set of forces pulling or repulsing the embeddings away from each other depending on whether the corresponding nodes are linked in the graph or not.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;If the nodes $i$ and $j$ are connected, we get $$a_{ij} - \sigma(x_{ij}) = 1 - \sigma(x_{ij}) = \frac{1}{1+\exp(x_{ij})}$$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;
+</description>
+        <pubDate>Thu, 01 Oct 2020 00:00:00 -0400</pubDate>
+        <link>/articles/20/latent_space_functions</link>
+        <guid isPermaLink="true">/articles/20/latent_space_functions</guid>
         
         
       </item>
