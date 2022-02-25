@@ -133,7 +133,10 @@ $$\norm{\vec{f_{ij}}} = \frac{2}{\norm{z_i - z_j}(1+\exp(s_{ij} (\gamma - \norm{
 For both positive and negative edges, this one tends to $+\infty$ when the distance tends to $0$
 
 
-We see that the first order derivative of the distance function has an impact on the type of force 
+<!-- We see that the first order derivative of the distance function has an impact on the type of force  -->
 
+# Conclusion
+In this article, we evaluate how the distance function in latent space models impact the form of the attractive and repulsive forces that govern the Maximum Likelihood Estimation.
+We see that depending on the form of the first order derivative of the distance function, the forces will have different behaviors when the distances go to 0 or to $\infty$
 
 {% bibliography --cited %}
