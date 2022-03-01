@@ -5,17 +5,114 @@
     <description></description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 25 Feb 2022 10:55:08 -0500</pubDate>
-    <lastBuildDate>Fri, 25 Feb 2022 10:55:08 -0500</lastBuildDate>
+    <pubDate>Tue, 01 Mar 2022 05:54:41 -0500</pubDate>
+    <lastBuildDate>Tue, 01 Mar 2022 05:54:41 -0500</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
     
       <item>
-        <title>A test draft</title>
-        <description>
+        <title>Variational Inference</title>
+        <description>&lt;p&gt;In this post, we give an overview of variational methods for Bayesian inference.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;We consider a setup where we observe a random variable $x\in\mathcal{X}$, that is conditioned by a unobserved variable $z \in \mathcal{Z}$. Examples of such setups include Latent Dirichlet allocation or Latent space models for graphs.&lt;/p&gt;
+
+&lt;h1 id=&quot;bayesian-setting&quot;&gt;Bayesian Setting&lt;/h1&gt;
+
+&lt;p&gt;We adopt a Bayesian view, where we provide a prior distribution $p(z)$ on the hidden variable $z$.&lt;/p&gt;
+
+&lt;p&gt;We would like to perform inference on the variable $z$ conditioned on the observation of $x$, namely our goal is to find a posterior distribution $p(z\vert x)$.&lt;/p&gt;
+
+&lt;p&gt;Using Baye’s rule, the latter is given by :&lt;/p&gt;
+
+&lt;p&gt;$$p(z\vert x) = \frac{p(x\vert z) p(z)}{p(x)}$$&lt;/p&gt;
+
+&lt;h2 id=&quot;the-evidence-and-its-intractability&quot;&gt;The evidence and its intractability&lt;/h2&gt;
+
+&lt;p&gt;Evaluating the posterior above involved evaluating the denominator, also called the &lt;em&gt;evidence&lt;/em&gt; :&lt;/p&gt;
+
+&lt;p&gt;$$p(x) = \int\limits p(x\vert z) p(z) dz$$&lt;/p&gt;
+
+&lt;p&gt;This evaluation requires integrating over a high dimensional latent space. In some cases the integrand $p(x\vert z) p(z)$ might adopt a nice form, making the integral tractable possibly in closed form. However in the general case computing this high dimensional integral is difficult.&lt;/p&gt;
+
+&lt;h2 id=&quot;a-possible-approach-monte-carlo-markov-chain&quot;&gt;A possible approach: Monte-Carlo Markov Chain&lt;/h2&gt;
+
+&lt;p&gt;In order to tackle the intractability of the evidence, a traditional method involves approximating this integral by sampling from a Markov Chain, and using the obtain samples ($z_1,…,z_n$) to compute a Monte Carlo estimate of the form:&lt;/p&gt;
+
+&lt;p&gt;$$p(x) \approx \frac{1}{n}\sum\limits_{i=1}^{n} p(x\vert z_i) p(z_i) $$&lt;/p&gt;
+
+&lt;p&gt;In the most common approaches (for instance the Metropolis-Hastings algorithm), the Markov transitions only require evaluating the numerator $p(x \vert z_i)p(z_i)$, and under some hypotheses the Markov chain is guaranteed to cover the latent space after a certain number of interations.&lt;/p&gt;
+
+&lt;p&gt;While this approach allows to estimate the exact posterior distribution, it suffers from the curse of dimensionality, since the number of samples requires to get a good Monte-Carlo estimate scales exponentially with the latent space dimension.&lt;/p&gt;
+
+&lt;h1 id=&quot;variational-inference&quot;&gt;Variational inference&lt;/h1&gt;
+
+&lt;p&gt;In order to counter the effects of dimensionality, another different approach is to estimate an approximation of the posterior.&lt;/p&gt;
+
+&lt;p&gt;As we will see, such an approximation casts the inference problem into an optimization problem, where the optimization variable is a density function. The term &lt;em&gt;variational&lt;/em&gt; comes from the fact we use a function, $q$ as an optimization variable in that formulation.&lt;/p&gt;
+
+&lt;h2 id=&quot;jensens-inequality-and-the-elbo&quot;&gt;Jensen’s inequality and the ELBO&lt;/h2&gt;
+
+&lt;p&gt;This is done by using Jensen’s inequality: for any positive density $z \mapsto q(z)$ we have:&lt;/p&gt;
+
+&lt;p&gt;$$
+\begin{aligned}\log(p(x)) &amp;amp;= log(\int\limits \frac{p(x, z)}{q(z)} q(z) dz)\\ &amp;amp;\geq
+\int\limits \log(\frac{p(x, z)}{q(z)}) q(z)) dz) \\ &amp;amp;=
+F(x, q)
+\end{aligned}
+$$&lt;/p&gt;
+
+&lt;p&gt;where we define the functional $$q \mapsto F(x, q) = \int\limits \log(\frac{p(x, z)}{q(z)}) q(z)) dz).$$ $F$ is commonly known as the $ELBO$ in variational inference litterature. As we can see, it is a function of both the observation $x$ and the density $q$.&lt;/p&gt;
+
+&lt;h2 id=&quot;link-with-the-kullback-leibler-divergence&quot;&gt;Link with the Kullback-Leibler divergence&lt;/h2&gt;
+
+&lt;p&gt;The Kullback-Leibler divergence between the variational density $q$ and the posterior distribution $p(. \vert x)$ writes:&lt;/p&gt;
+
+&lt;p&gt;$$
+\begin{aligned}
+KL(q\vert \vert p(.\vert x)) &amp;amp;=
+\int\limits \log(\frac{q(z)}{p(z \vert x)}) q(z) dz \\ &amp;amp;=
+\int\limits \log(\frac{p(x)q(z)}{p(x,z)}) q(z) dz \\ &amp;amp;=
+p(x) - \int\limits \log(\frac{p(x,z)}{q(z)}) q(z) dz \\ &amp;amp;=
+log(p(x)) - F(x,q)
+\end{aligned}
+$$&lt;/p&gt;
+
+&lt;p&gt;Thus, thus ELBO can be rewritten as $$F(x,q) = log(p(x)) - KL(q\vert \vert p(.\vert x)).$$&lt;/p&gt;
+
+&lt;p&gt;Maximizing $F$ with respect to $q$ is the same as minimizing the divergence between the $q$ and the posterior distribution.&lt;/p&gt;
+
+&lt;h2 id=&quot;approximating-the-posterior-distribution&quot;&gt;Approximating the posterior distribution&lt;/h2&gt;
+
+&lt;p&gt;$\newcommand{\PZ}{\mathcal{P(\mathcal{Z})}}$ Let $\PZ$ denote the set of all possible densities defined on the latent space $\mathcal{Z}$. The previous formula gives us a variational definition of the posterior:&lt;/p&gt;
+
+&lt;p&gt;$$
+p(. \vert x) = \underset{q \in \PZ}{argmax} \space F(x, q)
+$$&lt;/p&gt;
+
+&lt;p&gt;In variational inference we approximate this true posterior by instead optimizing on a subset of $\PZ$, denoted $\newcommand{\Q}{\mathcal{Q}}$$\Q$.&lt;/p&gt;
+
+&lt;p&gt;$$
+p(. \vert x) \approx \underset{q \in \Q}{argmax} \space F(x, q)
+$$&lt;/p&gt;
+
+&lt;p&gt;For instance $Q$ is often taken as a set of gaussian distributions on $Z$.&lt;/p&gt;
+
+&lt;p&gt;Using different tricks (e.g. the Mean-Field approximation) allows this familiy of method to scale better than Monte-Carlo estimation, but in contrast doesn’t yield an estimate of the exact posterior.&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;In this article we have seen how to use variational inference to approximate the posterior distribution in models having unobserved variables.&lt;/p&gt;
+
+&lt;p&gt;Note that the hidden variable $z$ can be root nodes in the graphical model, for instance in the case where $z$ are the parameters of the models, or interior nodes, as is the case for instance in Variational Autoencoders. In the latter case the ELBO is used as a computational vehicle to backpropagate to the parameters of a neural network, using the reparameterization trick.&lt;/p&gt;
+
+&lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;
 </description>
-        <pubDate>Fri, 25 Feb 2022 10:23:24 -0500</pubDate>
-        <link>/articles/22/a-test-draft</link>
-        <guid isPermaLink="true">/articles/22/a-test-draft</guid>
+        <pubDate>Tue, 01 Mar 2022 00:00:00 -0500</pubDate>
+        <link>/articles/22/variational_inference</link>
+        <guid isPermaLink="true">/articles/22/variational_inference</guid>
         
         
       </item>
@@ -299,8 +396,8 @@ If the prior similarity is high, the the disk need not be too close for the conn
       </item>
     
       <item>
-        <title>Maximum Entropy (MaxEnt) models for Graphs</title>
-        <description>&lt;p&gt;In this post, we explain Maximum Entropy models for graphs, as presented in previous work &lt;a class=&quot;citation&quot; href=&quot;#debie2010maximum&quot;&gt;(Bie, 2010)&lt;/a&gt; and &lt;a class=&quot;citation&quot; href=&quot;#adriaens&quot;&gt;(Adriaens et al., 2017)&lt;/a&gt;, and how they can be used to derive prior distributions on graphs.&lt;/p&gt;
+        <title>Maximum Entropy models for Graphs</title>
+        <description>&lt;p&gt;In this post, we give an overview Maximum Entropy models for graphs, as presented in previous work &lt;a class=&quot;citation&quot; href=&quot;#debie2010maximum&quot;&gt;(Bie, 2010)&lt;/a&gt; and &lt;a class=&quot;citation&quot; href=&quot;#adriaens&quot;&gt;(Adriaens et al., 2017)&lt;/a&gt;. We show how these models can be used to derive prior distributions on graphs.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -308,36 +405,49 @@ If the prior similarity is high, the the disk need not be too close for the conn
 
 &lt;p&gt;Many real-world phenomena can be (at least partially) described in the form of networks. Examples include social networks, user behavior online, neurons in the brain, ecological networks etc…&lt;/p&gt;
 
-&lt;p&gt;Before any real-world network is observed, the observer generally has prior expectations about the properties of this graph, depending on its nature.&lt;/p&gt;
+&lt;p&gt;However, while the set of all possible network with a given number of nodes $n$ is very large ($2^{\frac{n(n-1)}{2}}$), the set of real-world networks lie on a very small subset of these, meaning that the &lt;em&gt;majority&lt;/em&gt; of possible networks have a negligeable probability of occuring in practice.&lt;/p&gt;
+
+&lt;p&gt;While a defining the prior probability of all possible graphs is infeasible due to their huge number, one can easily define prior expectations on the &lt;em&gt;properties&lt;/em&gt; of this graph, depending on its nature.&lt;/p&gt;
 
 &lt;p&gt;For instance, one might have an idea of the number of links, the number of links &lt;em&gt;per node&lt;/em&gt; (their degree).&lt;/p&gt;
 
 &lt;p&gt;In a social network, one might have prior expectations about the number of links connecting any two communities. Indeed, the fact that people from the same community tend to connect more than from different ones is a fact commonly observed in real-world social networks and often quoted as &lt;em&gt;homophily&lt;/em&gt;.&lt;/p&gt;
 
+&lt;p&gt;Based on these prior expactations about the structural properties of the graph, the &lt;em&gt;Maximum Entropy&lt;/em&gt; (MaxEnt) principle can be used to cast these expectations into a fully-fledged probability distribution on the combinatorial space of all possible graphs.&lt;/p&gt;
+
 &lt;h1 id=&quot;formalizing-prior-expectations&quot;&gt;Formalizing prior expectations&lt;/h1&gt;
 
-&lt;p&gt;$\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\R}{\mathbb{R}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$&lt;/p&gt;
+&lt;p&gt;In this paragraph, we describe mathematically the aforementioned &lt;em&gt;prior expectations&lt;/em&gt;. To do this let’s first introduce some notations.&lt;/p&gt;
 
 &lt;h2 id=&quot;notations&quot;&gt;Notations&lt;/h2&gt;
 
-&lt;p&gt;Let $U$ a set of nodes. A graph is a tuple $G=(U, E)$ where $E\subset U \times U$ is the set of edges of the graph. For a fixed set of nodes $U$, we denote by $\Gcal$ the set of possible undirected graphs connecting the nodes in $U$. Each graph $G\in\Gcal$ can be fully described by its adjacency matrix: $A=(a_{ij})\in \{0,1\}^{n^2}$, such that $a_{ij}=1$ if and only if the nodes $i$ and $j$ are connected. For each node $i \in U$, we denote $\mathcal{N}(i)$ its set of neighbors.&lt;/p&gt;
+&lt;p&gt;$\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\R}{\mathbb{R}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$ $\newcommand{\Gcal}{\mathcal{G}}$Let $U$ a set of nodes of size $n$. A graph is a tuple $G=(U, E)$ where $E\subset U \times U$ is the set of edges of the graph. For a fixed set of nodes $U$, we denote by $\Gcal$ the set of possible undirected graphs connecting the nodes in $U$. Each graph $G\in\Gcal$ can be fully described by its adjacency matrix: $A=(a_{ij})\in \{0,1\}^{n^2}$, such that $a_{ij}=1$ if and only if the nodes $i$ and $j$ are connected. For each node $i \in U$, we denote $\mathcal{N}(i)$ its set of neighbors. We denote by $\newcommand{\PG}{\mathcal{P}(\mathcal{G})}$ $\PG$ the set of graph distributions, i.e. the set of all probability distributions on the set of graphs.&lt;/p&gt;
 
 &lt;h2 id=&quot;prior-statistics&quot;&gt;Prior statistics&lt;/h2&gt;
 
-&lt;p&gt;Prior expectations about a grpah can be expressed or modelled as &lt;em&gt;statistics&lt;/em&gt;, which are defined as measurable functions taking as input a graph and yielding a real number:&lt;/p&gt;
+&lt;p&gt;The properties graph can be expressed as &lt;em&gt;graph statistics&lt;/em&gt;, which are measurable functions taking as input a graph and yielding a real number:&lt;/p&gt;
 
 &lt;p&gt;$$
-\begin{aligned}
-f&amp;amp;: &amp;amp;G  &amp;amp;\mapsto&amp;amp; &amp;amp;f(G)  \\ &amp;amp;&amp;amp;\Gcal &amp;amp;\rightarrow&amp;amp; &amp;amp;\R&lt;br /&gt;
-\end{aligned}
+\begin{align} f&amp;amp;: &amp;amp;G  &amp;amp;\mapsto&amp;amp; &amp;amp;f(G)\\ &amp;amp;&amp;amp;\Gcal &amp;amp;\rightarrow&amp;amp; &amp;amp;\R
+\end{align}
 $$&lt;/p&gt;
 
-&lt;p&gt;Examples of such statistics include:&lt;/p&gt;
+&lt;p&gt;Examples of such statistics include for instance:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;The degree of each node $i$: $$f_i^{(degree)}(G) = \sum\limits_{j\in \cal{N}(i)} a_{ij}$$&lt;/li&gt;
   &lt;li&gt;The number of connections between two node subsets $W, W’ \subset U$: $$f_{W,W’}^{(block)}(G) = \sum\limits_{i,j \in W \times W’} a_{ij}$$&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;As we see, any graph property that can be mathematically computed as a real number can be defined as a graph statistic.&lt;/p&gt;
+
+&lt;h2 id=&quot;expected-value-of-a-prior-statistics&quot;&gt;Expected value of a prior statistics&lt;/h2&gt;
+
+&lt;p&gt;$\newcommand{\Ebb}{\mathbb{E}}$ For a given graph distribution $P \in \PG$, and a graph statistic $f$, one can define the expectation of this graph statistic as: $$\Ebb[f(G)]= \sum_{G\in \Gcal} f(G)P(G)$$&lt;/p&gt;
+
+&lt;p&gt;This is the mathematical definition of what we mean when we expect a given property about the graph to have a certain value.&lt;/p&gt;
+
+&lt;p&gt;The above value allows to compute what a given observer, whose subjectivity is encoded in the prior distribution $P$, expects the graph property $f$ to be.&lt;/p&gt;
 
 &lt;!--
 \$\$
@@ -351,7 +461,7 @@ f: G\in \Gcal \mapsto f(G) \in \R*+
 
 &lt;h2 id=&quot;graph-distributions&quot;&gt;Graph distributions&lt;/h2&gt;
 
-&lt;p&gt;A &lt;em&gt;graph distribution&lt;/em&gt; is a probability distribution defined on the set of graphs $\Gcal$. In other words, it can be identified witha function $P$ that gives for each graph $G \in \Gcal$ the likelihood $P(G)$ of observing this particular graph&lt;/p&gt;
+&lt;p&gt;A &lt;em&gt;graph distribution&lt;/em&gt; is a probability distribution defined on the set of graphs $\Gcal$. In other words, it can be identified with a function $P$ that gives for each graph $G \in \Gcal$ the likelihood $P(G)$ of observing this particular graph.&lt;/p&gt;
 
 &lt;h2 id=&quot;entropy-of-a-graph-distribution&quot;&gt;Entropy of a graph distribution.&lt;/h2&gt;
 
@@ -359,11 +469,16 @@ f: G\in \Gcal \mapsto f(G) \in \R*+
 
 &lt;p&gt;This quantity measures the average amount of information provided by the observation of a graph, under the distribution $P$.&lt;/p&gt;
 
+&lt;p&gt;For instance, if for a given observer all the graphs are equiprobable, the information provided by the observation of a graph is high. In other words this observer will be very &lt;em&gt;surprised&lt;/em&gt; on average by the observation.&lt;/p&gt;
+
+&lt;p&gt;In contrast, an observer that only gives a non-zero probability to a particular graph $G_0$, and zero probability to all the other graphs, doesn’t get any information when observing a graph sampled from its prior probability $H(P)=0$ in that case.&lt;/p&gt;
+
+&lt;!--
+Showing a particular graph $\hat{G}$ to an observer having a high entropy prior distribution $P$ will make the latter very _surprised_, in the sense that it will provide him with a lot of information on average.
+
+In contrast, an observer with a low entropy prior, for instance if the observer only expects one graph $\hat{G}$ tohappen  --&gt;
+
 &lt;!-- Under this principle, we want to find a distribution on the set of possible graphs $\Gcal$, that has maximum entropy value, --&gt;
-
-&lt;h2 id=&quot;expected-value-of-the-prior-statistics&quot;&gt;Expected value of the prior statistics&lt;/h2&gt;
-
-&lt;p&gt;$\newcommand{\Ebb}{\mathbb{E}}$ For a given graph distribution $P$, and a graph statistic $f$, one can define the expectation of this graph statistic as: $$\Ebb[f(G)]= \sum_{G\in \Gcal} f(G)P(G)$$&lt;/p&gt;
 
 &lt;h2 id=&quot;maximizing-the-entropy-under-statistics-based-constraints&quot;&gt;Maximizing the entropy under statistics-based constraints&lt;/h2&gt;
 
@@ -373,7 +488,9 @@ f: G\in \Gcal \mapsto f(G) \in \R*+
 
 &lt;p&gt;Namely, we want our distribution to satisfy for all $k=1,…,K$: $$\Ebb[f(G)]= c_k$$&lt;/p&gt;
 
-&lt;p&gt;Where $c_k$ is our prior expectation value for the statistic $k$. Under these constraints, we use the Maximum Entropy principle to define a prior distribution over the set of graphs such that the obtained distribution &lt;strong&gt;provides as least information&lt;/strong&gt; as possible, in addition to satisfying the statistic constraints.&lt;/p&gt;
+&lt;p&gt;where $c_k$ is our prior expectation value for the statistic $k$.&lt;/p&gt;
+
+&lt;p&gt;Under these constraints, we use the Maximum Entropy principle to derive the &lt;em&gt;least informative&lt;/em&gt; graph prior distribution satisfying the soft constraints.&lt;/p&gt;
 
 &lt;p&gt;Achieving this amounts in solving the Maximum Entropy constrained optimization problem:&lt;/p&gt;
 
@@ -529,7 +646,7 @@ $$&lt;/p&gt;
 &lt;p&gt;As we see in the previous expression, the gradients with respect to the embeddings can be view as a set of forces pulling or repulsing the embeddings away from each other depending on whether the corresponding nodes are linked in the graph or not.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;If the nodes $i$ and $j$ are connected, we get $$a_{ij} - \sigma(x_{ij}) = 1 - \sigma(x_{ij}) = \frac{1}{1+\exp(x_{ij})}$$&lt;/li&gt;
+  &lt;li&gt;If the nodes $i$ and $j$ are connected, we get $$a_{ij} - \sigma(x_{ij}) = 1 - \sigma(x_{ij}) = \frac{1}{1+\exp(x_{ij})}$$.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;
@@ -537,6 +654,17 @@ $$&lt;/p&gt;
         <pubDate>Thu, 01 Oct 2020 00:00:00 -0400</pubDate>
         <link>/articles/20/latent_space_functions</link>
         <guid isPermaLink="true">/articles/20/latent_space_functions</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>A test draft</title>
+        <description>
+</description>
+        <pubDate>Fri, 01 Feb 2019 00:00:00 -0500</pubDate>
+        <link>/articles/19/a-test-draft</link>
+        <guid isPermaLink="true">/articles/19/a-test-draft</guid>
         
         
       </item>
