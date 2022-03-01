@@ -9,5 +9,5 @@ group :jekyll_plugins do
   gem 'jekyll-spaceship'
   gem 'kramdown-math-katex'
   gem 'jekyll-scholar'
-  
+  gem "therubyracer"
 end
