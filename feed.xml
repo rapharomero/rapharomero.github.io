@@ -5,13 +5,139 @@
     <description></description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 01 Mar 2022 10:42:25 -0500</pubDate>
-    <lastBuildDate>Tue, 01 Mar 2022 10:42:25 -0500</lastBuildDate>
+    <pubDate>Mon, 14 Mar 2022 10:52:19 -0400</pubDate>
+    <lastBuildDate>Mon, 14 Mar 2022 10:52:19 -0400</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
     
       <item>
-        <title>Variational Inference</title>
-        <description>&lt;p&gt;In this post, we give an overview of variational methods for Bayesian inference.&lt;/p&gt;
+        <title>The Expectation-Maximization algorithm</title>
+        <description>&lt;p&gt;In this post, I explain the popular Expectation-Maximization algorithm under a variational methods perspective.$\newcommand{\set}[1]{\left\{ #1 \right\}}$&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;Let’s consider an observation $x\in\mathcal{X}$. In a traditional statistical setting, we posit a model $\set{ p_{\theta} \vert \theta \in \Theta} $ describing the generation process of the variable $x$, and we would like to make inference on the parameter $\theta$.&lt;/p&gt;
+
+&lt;p&gt;However, observations are often best described by introducing an unobserved latent variable $z\in \mathcal{Z}$. This unobserved variable can either correspond to an existing unobserved real-world attribute of the data, or to an abstract hypothesis made to describe the data (for instance in clustering, we define clusters and cluster assignments as latent variables).&lt;/p&gt;
+
+&lt;p&gt;In that context, computing the log-likelihood of the data involves integrating over the latent variable, since:&lt;/p&gt;
+
+&lt;p&gt;$$
+p_{\theta}(x) = \int p_{\theta}(x,z) dz
+$$&lt;/p&gt;
+
+&lt;h1 id=&quot;maximum-likelihood-estimation&quot;&gt;Maximum Likelihood Estimation&lt;/h1&gt;
+
+&lt;p&gt;Let’s suppose we aim to provide a Maximum Likelihood Estimate $\hat{\theta}^{(MLE)}$ of the parameter $\theta$. Classically, to do this we maximize the log-likelihood of the data:&lt;/p&gt;
+
+&lt;p&gt;$$
+\max\limits_{\theta} \log \left(\int p_{\theta}(x,z) dz \right)
+$$&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, due to the presence of the integral, this function of $\theta$ is often non-convex, and thus difficult to optimize as such.&lt;/p&gt;
+
+&lt;p&gt;However, in many cases, once the latent variable is known, the log-likelihood becomes convex and becomes easy to optimize, &lt;em&gt;for this particular value of the latent variable&lt;/em&gt;:&lt;/p&gt;
+
+&lt;p&gt;$$\max\limits_{\theta} \log \left(p_{\theta}(x,z) \right)$$&lt;/p&gt;
+
+&lt;p&gt;The Expectation-Maximization algorithm &lt;a class=&quot;citation&quot; href=&quot;#Dempster1977&quot;&gt;(Dempster et al., 1977)&lt;/a&gt; provides a solution in this particular case, by essentially performing alternate optimization on the parameter, and a variational distribution.&lt;/p&gt;
+
+&lt;h1 id=&quot;variational-expression-of-the-log-likelihood&quot;&gt;Variational Expression of the log-likelihood&lt;/h1&gt;
+
+&lt;p&gt;$\newcommand{\PZ}{\mathcal{P(\mathcal{Z})}}$ Let $\PZ$ denote the set of all possible densities defined on the latent space $\mathcal{Z}$.&lt;/p&gt;
+
+&lt;p&gt;As is common in variational methods, we use Jensen’s inequality to rewrite the log-likelihood of the data as:&lt;/p&gt;
+
+&lt;p&gt;$$
+log(p_{\theta}(x)) = \underset{q \in \PZ}{max} \space F(x, q;\theta)
+$$&lt;/p&gt;
+
+&lt;p&gt;Where $F(x,q; \theta)$ is the &lt;em&gt;variational free energy&lt;/em&gt; defined as&lt;/p&gt;
+
+&lt;p&gt;$$
+F(x, q;\theta) = \int
+\log(
+  \frac{p_{\theta}(x,z)}{q(z)}
+)
+  q(z)dz
+$$&lt;/p&gt;
+
+&lt;p&gt;As a consequence, the maximization of the log likelihood becomes a double maximization problem:&lt;/p&gt;
+
+&lt;p&gt;$$
+\max \limits_{\theta} \log \left(p_{\theta}(x) \right) = \max\limits_{\theta} \max\limits_{q\in \PZ} F(x,q;\theta)
+$$&lt;/p&gt;
+
+&lt;h1 id=&quot;alternate-optimization-of-the-variational-free-energy&quot;&gt;Alternate optimization of the Variational Free Energy&lt;/h1&gt;
+
+&lt;p&gt;Since the optimization problem involves two maximizations, the fundamental idea of the EM algorithm is thus to perform alternate optimization.&lt;/p&gt;
+
+&lt;p&gt;Supposing that at step $t$ we obtain a parameter value $\theta^{t}$ and $q^t$, we update these values one after the other in two steps&lt;/p&gt;
+
+&lt;h3 id=&quot;the-expectation-step&quot;&gt;The Expectation Step&lt;/h3&gt;
+
+&lt;p&gt;In that step, we fix the value of the parameter $\theta^{t}$ and maximize $F$ with respect to the variational distribution:&lt;/p&gt;
+
+&lt;p&gt;$$q^{t+1}=\underset{q}{argmax}\space F(x,q,\theta^{t}).$$&lt;/p&gt;
+
+&lt;p&gt;Using the Lagrange multiplier methods, one can easily find that the optimal distribution is given by the conditional distribution of the latent variable given the data $x$, under the current set of parameters $\theta^t$:&lt;/p&gt;
+
+&lt;p&gt;$$q^{t+1}(z) = p_{\theta^t}(z \vert x)$$&lt;/p&gt;
+
+&lt;p&gt;Injecting back this optimal distribution into the variational free energy yields a new convex function of $\theta$, given by:$\newcommand{\E}{\mathbb{E}}$&lt;/p&gt;
+
+&lt;p&gt;$$&lt;/p&gt;
+
+&lt;p&gt;\begin{aligned}F(x,q^{t+1}, \theta) &amp;amp;=
+F(x,p_{\theta^t}(. \vert x), \theta)\\ &amp;amp;=
+\int
+\log(
+  \frac{p_{\theta}(x,z)}{p_{\theta^t}(z \vert x)}
+)
+  p_{\theta^t}(z \vert x) dz \\ &amp;amp;=
+\E_{Z\sim p_{\theta^t}(.\vert x)}[\log(p_{\theta}(x,Z))] + H(p_{\theta^t}(. \vert x))
+\end{aligned}
+$$&lt;/p&gt;
+
+&lt;p&gt;where $H(p_{\theta^t}(. \vert x))$ is the entropy of the conditional latent distribution $p_{\theta^t}(. \vert x)$.&lt;/p&gt;
+
+&lt;p&gt;Since the entropy term doesn’t depend on the parameter $\theta$, the annex function to optimize is given by the expectation of the joint likelihood, under the conditional distribution of the latent variable given the observation and the current parameter:&lt;/p&gt;
+
+&lt;p&gt;$$
+\theta \mapsto E(\theta)=\E_{Z\sim p_{\theta^t}(.\vert x)}[\log(p_{\theta}(x,Z))]
+$$&lt;/p&gt;
+
+&lt;p&gt;Thus this step is called the &lt;strong&gt;Expectation&lt;/strong&gt; step.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-maximization-step&quot;&gt;The Maximization step&lt;/h3&gt;
+
+&lt;p&gt;Once the annex function has been derived in the Expectation step, its convexity allows us to easily maximize it with respect to the model parameter:&lt;/p&gt;
+
+&lt;p&gt;$$
+\theta^{t+1} = \max\limits_{\theta} E(\theta)
+$$&lt;/p&gt;
+
+&lt;p&gt;This step is thus called the &lt;strong&gt;Maximization step&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;In this article we have presented the Expectation-Maximization algorithm and its close connection with variational methods. While its name suggest otherwise, this algorithm is simply a form of alternate optimization of the Variational Free Energy, with respect to the model parameters on the one hand, and a variational distribution defined on the latent space on the other hand.&lt;/p&gt;
+
+&lt;p&gt;It can be noted that although this algorithm is described in the context where we optimize a log-likelihood, it applies more generally to &lt;em&gt;any setup&lt;/em&gt; where the objective function involves integrating over a latent variable.&lt;/p&gt;
+
+&lt;ol class=&quot;bibliography&quot;&gt;&lt;li&gt;&lt;span id=&quot;Dempster1977&quot;&gt;Dempster, A. P., Laird, N. M., &amp;amp; Rubin, D. B. (1977). Maximum Likelihood from Incomplete Data Via the EM Algorithm . In &lt;i&gt;Journal of the Royal Statistical Society: Series B (Methodological)&lt;/i&gt; (Vol. 39, Number 1, pp. 1–22). https://doi.org/10.1111/j.2517-6161.1977.tb01600.x&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;
+</description>
+        <pubDate>Mon, 14 Mar 2022 00:00:00 -0400</pubDate>
+        <link>/articles/22/expectation-maximization</link>
+        <guid isPermaLink="true">/articles/22/expectation-maximization</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Variational Methods</title>
+        <description>&lt;p&gt;In this post, I give an overview of variational methods in the context of Bayesian inference.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -111,8 +237,8 @@ $$&lt;/p&gt;
 &lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;
 </description>
         <pubDate>Tue, 01 Mar 2022 00:00:00 -0500</pubDate>
-        <link>/articles/22/variational_inference</link>
-        <guid isPermaLink="true">/articles/22/variational_inference</guid>
+        <link>/articles/22/variational_methods</link>
+        <guid isPermaLink="true">/articles/22/variational_methods</guid>
         
         
       </item>

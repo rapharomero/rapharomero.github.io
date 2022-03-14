@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>🧮 Variational Methods</title>
+  <meta name="description" content="In this post, I give an overview of variational methods in the context of Bayesian inference.">
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  
+    <link href="//fonts.googleapis.com/css?family=Lato:400,400italic" rel="stylesheet" type="text/css">
+  
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <script>
+    let options = {
+      delimiters: [
+        { left: "$", right: "$", display: false },
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
+      ]
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, options);
+    });
+
+</script>
+
+  
+
+
+  <link rel="stylesheet" type="text/css" href="/css/tufte.css">
+  <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="/articles/22/variational_methods">
+
+  <link rel="alternate" type="application/rss+xml" title="Raphaël's research website" href="/feed.xml">
+<script>MathJax={"tex":{"inlineMath":[["$","$"],["\\(","\\)"]],"displayMath":[["$$","$$"],["\\[","\\]"]]},"svg":{"fontCache":"global"}}</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	<!-- <a href="/"><img class="badge" src="/assets/img/badge_1.png" alt="CH"></a> -->
+	
+		
+  	
+		
+		    
+		      <a href="/about/">About</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/">Home</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>Variational Methods</h1>
+<p class="subtitle">March 1, 2022</p>
+
+<p>In this post, I give an overview of variational methods in the context of Bayesian inference.</p>
+
+<!--more-->
+
+<h1 id="introduction">Introduction</h1>
+
+<p>We consider a setup where we observe a random variable $x\in\mathcal{X}$, that is conditioned by a unobserved variable $z \in \mathcal{Z}$. Examples of such setups include Latent Dirichlet allocation or Latent space models for graphs.</p>
+
+<h1 id="bayesian-setting">Bayesian Setting</h1>
+
+<p>We adopt a Bayesian view, where we provide a prior distribution $p(z)$ on the hidden variable $z$.</p>
+
+<p>We would like to perform inference on the variable $z$ conditioned on the observation of $x$, namely our goal is to find a posterior distribution $p(z\vert x)$.</p>
+
+<p>Using Bayes ‘rule, the latter is given by :</p>
+
+<p>$$p(z\vert x) = \frac{p(x\vert z) p(z)}{p(x)}$$</p>
+
+<h2 id="the-evidence-and-its-intractability">The evidence and its intractability</h2>
+
+<p>Evaluating the posterior above involved evaluating the denominator, also called the <em>evidence</em> :</p>
+
+<p>$$p(x) = \int\limits p(x\vert z) p(z) dz$$</p>
+
+<p>This evaluation requires integrating over a high dimensional latent space. In some cases the integrand $p(x\vert z) p(z)$ might adopt a nice form, making the integral tractable possibly in closed form. However in the general case computing this high dimensional integral is difficult.</p>
+
+<h2 id="a-possible-approach-monte-carlo-markov-chain">A possible approach: Monte-Carlo Markov Chain</h2>
+
+<p>In order to tackle the intractability of the evidence, a traditional method involves approximating this integral by sampling from a Markov Chain, and using the obtain samples ($z_1,…,z_n$) to compute a Monte Carlo estimate of the form:</p>
+
+<p>$$p(x) \approx \frac{1}{n}\sum\limits_{i=1}^{n} p(x\vert z_i) p(z_i) $$</p>
+
+<p>In the most common approaches (for instance the Metropolis-Hastings algorithm), the Markov transitions only require evaluating the numerator $p(x \vert z_i)p(z_i)$, and under some hypotheses the Markov chain is guaranteed to cover the latent space after a certain number of interations.</p>
+
+<p>While this approach allows to estimate the exact posterior distribution, it suffers from the curse of dimensionality, since the number of samples requires to get a good Monte-Carlo estimate scales exponentially with the latent space dimension.</p>
+
+<h1 id="variational-inference">Variational inference</h1>
+
+<p>In order to counter the effects of dimensionality, another different approach is to estimate an approximation of the posterior.</p>
+
+<p>As we will see, such an approximation casts the inference problem into an optimization problem, where the optimization variable is a density function. The term <em>variational</em> comes from the fact we use a function, $q$ as an optimization variable in that formulation.</p>
+
+<h2 id="jensens-inequality-and-the-elbo">Jensen’s inequality and the ELBO</h2>
+
+<p>This is done by using Jensen’s inequality: for any positive density $z \mapsto q(z)$ we have:</p>
+
+<p>$$
+\begin{aligned}\log(p(x)) &amp;= log(\int\limits \frac{p(x, z)}{q(z)} q(z) dz)\\ &amp;\geq
+\int\limits \log(\frac{p(x, z)}{q(z)}) q(z)) dz) \\ &amp;=
+F(x, q)
+\end{aligned}
+$$</p>
+
+<p>where we define the functional $$q \mapsto F(x, q) = \int\limits \log(\frac{p(x, z)}{q(z)}) q(z)) dz).$$ $F$ is commonly known as the $ELBO$ in variational inference litterature. As we can see, it is a function of both the observation $x$ and the density $q$.</p>
+
+<h2 id="link-with-the-kullback-leibler-divergence">Link with the Kullback-Leibler divergence</h2>
+
+<p>The Kullback-Leibler divergence between the variational density $q$ and the posterior distribution $p(. \vert x)$ writes:</p>
+
+<p>$$
+\begin{aligned}
+KL(q\vert \vert p(.\vert x)) &amp;=
+\int\limits \log(\frac{q(z)}{p(z \vert x)}) q(z) dz \\ &amp;=
+\int\limits \log(\frac{p(x)q(z)}{p(x,z)}) q(z) dz \\ &amp;=
+p(x) - \int\limits \log(\frac{p(x,z)}{q(z)}) q(z) dz \\ &amp;=
+log(p(x)) - F(x,q)
+\end{aligned}
+$$</p>
+
+<p>Thus, thus ELBO can be rewritten as $$F(x,q) = log(p(x)) - KL(q\vert \vert p(.\vert x)).$$</p>
+
+<p>Maximizing $F$ with respect to $q$ is the same as minimizing the divergence between the $q$ and the posterior distribution.</p>
+
+<h2 id="approximating-the-posterior-distribution">Approximating the posterior distribution</h2>
+
+<p>$\newcommand{\PZ}{\mathcal{P(\mathcal{Z})}}$ Let $\PZ$ denote the set of all possible densities defined on the latent space $\mathcal{Z}$. The previous formula gives us a variational definition of the posterior:</p>
+
+<p>$$
+p(. \vert x) = \underset{q \in \PZ}{argmax} \space F(x, q)
+$$</p>
+
+<p>In variational inference we approximate this true posterior by instead optimizing on a subset of $\PZ$, denoted $\newcommand{\Q}{\mathcal{Q}}$$\Q$.</p>
+
+<p>$$
+p(. \vert x) \approx \underset{q \in \Q}{argmax} \space F(x, q)
+$$</p>
+
+<p>For instance $Q$ is often taken as a set of gaussian distributions on $Z$.</p>
+
+<p>Using different tricks (e.g. the Mean-Field approximation) allows this familiy of method to scale better than Monte-Carlo estimation, but in contrast doesn’t yield an estimate of the exact posterior.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>In this article we have seen how to use variational inference to approximate the posterior distribution in models having unobserved variables.</p>
+
+<p>Note that the hidden variable $z$ can be root nodes in the graphical model, for instance in the case where $z$ are the parameters of the models, or interior nodes, as is the case for instance in Variational Autoencoders. In the latter case the ELBO is used as a computational vehicle to backpropagate to the parameters of a neural network, using the reparameterization trick.</p>
+
+<ol class="bibliography"></ol>
+
+
+
+    </article>
+    <span class="print-footer">Variational Methods - March 1, 2022 - raphael romero</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+    <li><a href="mailto:hate@spam.net"><span class="icon-mail3"></span></a></li>    
+    
+      <li>
+        <a href="//www.twitter.com/twitter_handle"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//plus.google.com/+googlePlusName"><span class="icon-google2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/GithubHandle"><span class="icon-github"></span></a>
+      </li>
+    
+      <li>
+        <a href="//www.flickr.com/photos/FlickrUserID"><span class="icon-flickr3"></span></a>
+      </li>
+    
+      <li>
+        <a href="/feed"><span class="icon-rss2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//vimeo.com/vimeo-id"><span class="icon-vimeo2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//www.linkedin.com/"><span class="icon-linkedin"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>© 2022   RAPHAEL ROMERO</span> <br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for Content-centric blogging </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+  </body>
+</html>
