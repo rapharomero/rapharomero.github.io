@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>🧮 About train-test splitting for link prediction</title>
+  <meta name="description" content="In this post, we describe the link prediction task for networks, and the strategies to evaluate link prediction methods">
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  
+    <link href="//fonts.googleapis.com/css?family=Lato:400,400italic" rel="stylesheet" type="text/css">
+  
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <script>
+    let options = {
+      delimiters: [
+        { left: "$", right: "$", display: false },
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
+      ]
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, options);
+    });
+
+</script>
+
+  
+
+
+  <link rel="stylesheet" type="text/css" href="/css/tufte.css">
+  <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="/articles/22/on_link_prediction">
+
+  <link rel="alternate" type="application/rss+xml" title="Raphaël's research website" href="/feed.xml">
+<script>MathJax={"tex":{"inlineMath":[["$","$"],["\\(","\\)"]],"displayMath":[["$$","$$"],["\\[","\\]"]]},"svg":{"fontCache":"global"}}</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	<!-- <a href="/"><img class="badge" src="/assets/img/badge_1.png" alt="CH"></a> -->
+	
+		
+  	
+		
+		    
+		      <a href="/">Home</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/posts">Posts</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>About train-test splitting for link prediction</h1>
+<p class="subtitle">March 25, 2022</p>
+
+<p>In this post, we describe the link prediction task for networks, and the strategies to evaluate link prediction methods</p>
+
+<!--more-->
+
+<h1 id="introduction">Introduction</h1>
+
+<p>Link prediction is a machine learning task that that consists in predicting missing links on an observed network. Applications of this tasks include recommender systems, friend recommendations on social media, proediction of protein-protein interaction in biology, among others.</p>
+
+<p>A link prediction method can be seen as a score function, that takes as input an edge $e$ and yields a score $s(e) \in [0,1]$</p>
+
+<h1 id="evaluations-strategy">Evaluations strategy</h1>
+
+<p>We want to evaluate a Link prediction method on a given graph $G= (U,E)$, $U$ being the set of nodes in the graph and $E\subset U\times U$ the set of edges.</p>
+
+<h1 id="pruning---traintest-splitting">Pruning - Train/test splitting</h1>
+
+<p>The first step is to remove some of the observed edges.</p>
+
+<p>Doing so yields a pruned graph $\newcommand{tE}{\tilde{E}}$ $\newcommand{\tG}{\tilde{G}}$ $\tG = (U,\tE)$, where $\tE\subset E$. Note that this pruned graph can be disconnected and have isolated nodes.</p>
+
+<p>We denote $\newcommand{\mE}{E_{missing}}$$\mE$ the set of edges that were removed during this pruning operation, i.e. $\mE=E \backslash \tE$.</p>
+
+<p>In contrast, we denote $\newcommand{\nE}{E_{neg}}$$\nE$ the set of true negative edges, i.e. the edges that were effectively not in the original graph.</p>
+
+<p>This set is disjoint from the set of missing edges: $\nE \cap \mE = \emptyset$</p>
+
+<p>The goal of link prediction is to score the edges that were removed from the graph higher than the edges that were not in the graph in the first place.</p>
+
+<p>In other words, we construct a binary classification dataset composed of edges $e\in \mE \cup \nE$, and a response variable $y=1$ if $e \in \mE$ and $y=0$ else.</p>
+
+<h1 id="metrics">Metrics</h1>
+
+<p>Within the context described before, the missing edges can be reframed <em>true positive</em>, while the negative edges cna be called <em>true negative</em>. The link prediction methods can then be evaluated as a binary classifier, trying to discriminate edges that were removed during the pruning process, from edges that were already negative in the original graph.</p>
+
+<p>Given a threshold value $\tau$, we can define a decision rule on the set of edges $e$.</p>
+
+<h2 id="example">Example</h2>
+
+<p>Let’s suppose that our test set is composed of 7 edges $e_1,…,e_7$, and that we set the decision threshold to $\tau=0.89$.</p>
+
+<p>In the table below, we order the edges in order of their link prediction scores, and predict them to be positive if their score is higher than the threshold.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Edge</th>
+      <th>$e_1$</th>
+      <th>$e_2$</th>
+      <th>$e_3$</th>
+      <th>$e_4$</th>
+      <th>$e_5$</th>
+      <th>$e_6$</th>
+      <th>$e_7$</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Score</td>
+      <td>0.95</td>
+      <td>0.94</td>
+      <td>0.92</td>
+      <td>0.9</td>
+      <td>0.8</td>
+      <td>0.79</td>
+      <td>0.73</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td>Label</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td>Prediction</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>As we can see, using this threshold, we have selected $P(\tau)=4$ edges as positive.</p>
+
+<p>Among these 4 edges:</p>
+
+<ul>
+  <li>$e_1$, $e_2$ and $e_3$ are correctly labeled as positive (namely ) so the number of true positives is $TP(\tau)=3$.</li>
+  <li>$e_4$ is wrongly labeled as positive, so the number of false positives is $FP(\tau)=1$.</li>
+  <li>$e_6$ is wrongly labeled as negative, so the number of false negative is $FP(\tau)=1$.</li>
+</ul>
+
+<p>Based on these rate, we can derive the following confusion matrix: <label for="note" class="margin-toggle sidenote-number"></label><input type="checkbox" id="note" class="margin-toggle"><span class="sidenote">Note that all the values above are piecewise constant functions of the decision threshold, where the cutoff points are the score values of each samples. </span></p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Predicted Positive</th>
+      <th>Predicted Negative</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Positive</td>
+      <td>TP=3</td>
+      <td>FN=1</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td>Negative</td>
+      <td>FP=1</td>
+      <td>TN=2</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="precision-and-recall">Precision and Recall</h3>
+
+<p>The precision is the ratio of positively predicted edges that have a positive ground truth label.</p>
+
+<p>The recall is the percentage of edges having a ground truth positive label that were effectively classified, or “recalled” as positive.</p>
+
+<p>To remind of these notions, one can think of the score as the result of a search on Google. Given a query term, Google looks for most relevant articles and returns them, ordered by relevance. One can then select the first $K$ of these articles, and decide whether they are actually relevant or not (i.e. the ground truth is given by the user). The precision score tells us how precise the results are, ensuring that Google doesn’t yield too many unrelevant articles. The recall on the other hand, ensures that Google will give a high rank to a good proportion of the articles that are relevant for the user.</p>
+
+<ol class="bibliography"></ol>
+
+
+
+    </article>
+    <span class="print-footer">About train-test splitting for link prediction - March 25, 2022 - raphael romero</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+    <li><a href="mailto:hate@spam.net"><span class="icon-mail3"></span></a></li>    
+    
+      <li>
+        <a href="//www.twitter.com/twitter_handle"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//plus.google.com/+googlePlusName"><span class="icon-google2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/GithubHandle"><span class="icon-github"></span></a>
+      </li>
+    
+      <li>
+        <a href="//www.flickr.com/photos/FlickrUserID"><span class="icon-flickr3"></span></a>
+      </li>
+    
+      <li>
+        <a href="/feed"><span class="icon-rss2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//vimeo.com/vimeo-id"><span class="icon-vimeo2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//www.linkedin.com/"><span class="icon-linkedin"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>© 2022   RAPHAEL ROMERO</span> <br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for Content-centric blogging </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+  </body>
+</html>
