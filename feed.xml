@@ -5,9 +5,308 @@
     <description></description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 15 Mar 2022 09:48:34 -0400</pubDate>
-    <lastBuildDate>Tue, 15 Mar 2022 09:48:34 -0400</lastBuildDate>
+    <pubDate>Thu, 20 Oct 2022 08:00:49 -0400</pubDate>
+    <lastBuildDate>Thu, 20 Oct 2022 08:00:49 -0400</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
+    
+      <item>
+        <title>Investigating Different distance function for Latent Distance graph models</title>
+        <description>&lt;p&gt;In this post, we consider Latent Space models for graphs, and investigate the impact of the distance function used on the embedding space.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;Latent Space models for graphs are defined such that the independent edge link probabilities are given by functions of the distance between some embeddings. $\newcommand{\norm}[1]{\vert\vert #1 \vert\vert}$. Denoting $i,j$ some node indices, $z_i \in \mathbb{R}^d$ some node embeddings of dimension $d&amp;gt;0$.&lt;/p&gt;
+
+&lt;p&gt;$$
+\begin{align}
+\label{model}
+y_{ij} &amp;amp;\sim Bernoulli(\theta_{ij}) \\ \theta_{ij} &amp;amp;= \sigma(x_{ij}) \\  x_{ij} &amp;amp;= \gamma- g(\norm{z_i - z_j}^2)
+\end{align}
+$$&lt;/p&gt;
+
+&lt;p&gt;where $x_{ij}$ are the logits of the model, $\theta_{ij}$ are the edge link probabilities and $\sigma$ is the sigmoid link function.&lt;/p&gt;
+
+&lt;p&gt;The function g can be any non-decreasing, non-negative smooth function. For instance:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;If g is the identity function: $x_{ij} = \gamma- \norm{z_i - z_j}^2$&lt;/li&gt;
+  &lt;li&gt;If g is the square root function: $x_{ij} = \gamma- \norm{z_i - z_j}$&lt;/li&gt;
+  &lt;li&gt;If g is the log: $x_{ij} = \gamma- 2\log(\norm{z_i - z_j})$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We would like to investigate the impact on this distance function on the embeddings found by performing Maximum Likelihood Estimation of the model, given an observed graph.&lt;/p&gt;
+
+&lt;h1 id=&quot;likelihood-and-gradient-of-the-model&quot;&gt;Likelihood and gradient of the model&lt;/h1&gt;
+
+&lt;p&gt;The likelihood of a given observed undirected graph $\hat{G}$ with adjacency matrix $A={a_{ij}}$ is given by:&lt;/p&gt;
+
+&lt;p&gt;$$p(\hat{G}) = \prod\limits_{i&amp;lt;j} \theta_{ij}^{y_{ij}} (1-\theta_{ij})^{1-y_{ij}}$$&lt;/p&gt;
+
+&lt;p&gt;Hence we get the following negative log-likelihood, as a function of the embeddings $z_i$:&lt;/p&gt;
+
+&lt;p&gt;$$L(z) = \sum\limits_{i&amp;lt;j} log(1+ exp(x_{ij}))  - y_{ij} x_{ij}$$&lt;/p&gt;
+
+&lt;h1 id=&quot;gradient&quot;&gt;Gradient&lt;/h1&gt;
+
+&lt;p&gt;For a given node $i$, we compute the gradient of the loss function with respect to the embedding $z_i$.&lt;/p&gt;
+
+&lt;p&gt;This one is given by:&lt;/p&gt;
+
+&lt;p&gt;$$\nabla_{z_i}L(z) = \sum_{j\neq i} (\nabla_{z_i}x_{ij}) (y_{ij} - \sigma(x_{ij}))$$&lt;/p&gt;
+
+&lt;p&gt;Moreover, using the chain rule gives us the gradient of the logit $x_{ij}$ with respect to the embeddings:&lt;/p&gt;
+
+&lt;p&gt;$$\nabla_{z_i}x_{ij} = -2(z_i - z_j) g’(\norm{z_i-z_j}^2)$$&lt;/p&gt;
+
+&lt;p&gt;So finally we get the following gradient:&lt;/p&gt;
+
+&lt;p&gt;$$\nabla_{z_i}L(z) = \sum_{j\neq i} 2(z_i - z_j) g’(\norm{z_i-z_j}^2) (y_{ij} - \sigma(x_{ij}))$$&lt;/p&gt;
+
+&lt;h1 id=&quot;interpretation-in-terms-of-forces&quot;&gt;Interpretation in terms of forces&lt;/h1&gt;
+
+&lt;p&gt;As we see in the previous expression, the gradients with respect to the embeddings can be view as a set of forces pulling or repulsing the embeddings away from each other depending on whether the corresponding nodes are linked in the graph or not.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;If the nodes $i$ and $j$ are connected (i.e. $y_{ij}=1$), we get :
+$$y_{ij} - \sigma(x_{ij}) = 1 - \sigma(x_{ij}) = \frac{1}{1+\exp(x_{ij})}&amp;gt;0.$$
+So the associate gradient term will be the following &lt;em&gt;attractive force&lt;/em&gt;
+$$
+\begin{aligned}
+\vec{f_{ij}^{+}} &amp;amp;= 2(z_i - z_j) g’(\norm{z_i-z_j}^2) (y_{ij} - \sigma(x_{ij})) \\ &amp;amp;= (z_i - z_j) (\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(x_{ij})})
+\end{aligned}
+$$
+Indeed, since $g$ is non-decreasing we have $\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(x_{ij})} &amp;gt;=0$, so this vector is oriented from the embedding $z_j$ to the embedding $z_i$, hence the term “attractive”.
+Later, we might be interested in how the intensity of this force scales with the distance between embeddings.&lt;/li&gt;
+  &lt;li&gt;If the nodes $i$ and $j$ are not connected, we have $y_{ij} - \sigma(x_{ij}) = -\sigma(x_{ij})$ the embeddings are connected by the following $repulsive force$ (essentially pushing away $z_j$ from $z_i$):
+$$
+\begin{aligned}
+\vec{f_{ij}^{-}} = - (z_i - z_j) (\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(-x_{ij})})
+\end{aligned}
+$$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Denoting the &lt;em&gt;sign&lt;/em&gt; variable $s_{ij} = 1$ if $y_{ij}=1$ and $s_{ij} = -1$ if $y_{ij}=0$, we get the following compact formula for this force term:&lt;/p&gt;
+
+&lt;p&gt;$$
+  \begin{aligned}
+  \vec{f_{ij}} = s_{ij} (z_i - z_j) (\frac{2 g’(\norm{z_i-z_j}^2)}{1+\exp(s_{ij} x_{ij})})
+  \end{aligned}
+$$&lt;/p&gt;
+
+&lt;h1 id=&quot;examples&quot;&gt;Examples&lt;/h1&gt;
+
+&lt;p&gt;Using different distance functions, we can derive the attractive and repulsive forces to have an idea of their intensity.&lt;/p&gt;
+
+&lt;h3 id=&quot;identity-distance-function&quot;&gt;Identity distance function&lt;/h3&gt;
+
+&lt;p&gt;In the case where $g$ is simply the identity function, we get a signed force equal to
+$$\vec{f_{ij}} =  s_{ij}(z_i-z_j)\frac{2}{1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2))}$$
+Thus, in that case the norm of the force is given by&lt;/p&gt;
+
+&lt;p&gt;$$\norm{\vec{f_{ij}}} = \frac{2\norm{z_i-z_j}}{1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2))}$$&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;For positive edges ($s_{ij}=1$), this force reaches its minimum when the embeddings match, and will tend to infinity exponentially in the squared distance between embeddings:
+$$\norm{\vec{f_{ij}}} \sim 2\norm{z_i-z_j}exp(\norm{z_i-z_j}^2)$$ when $\norm{z_i-z_j} \rightarrow +\infty$.&lt;/li&gt;
+  &lt;li&gt;For negative edges ($s_{ij}=-1$), this force becomes decreasing in the distance, and tends to $0$ when $\norm{z_i-z_j} \rightarrow +\infty$.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;square-root-distance-functions&quot;&gt;Square root distance functions&lt;/h3&gt;
+
+&lt;p&gt;If $g$ is the squared root function, we get a signed force equal to
+$$\vec{f_{ij}} =  \frac{s_{ij}(z_i-z_j)}{\norm{z_i - z_j}(1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2)))}$$&lt;/p&gt;
+
+&lt;p&gt;The norm of this force term writes:
+$$\norm{\vec{f_{ij}}} = \frac{2}{1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}^2))}$$&lt;br /&gt;
+This has the following assymptotic behavior:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;when $\norm{z_i-z_j} \rightarrow +\infty$.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;log-distance-functions&quot;&gt;Log distance functions&lt;/h3&gt;
+
+&lt;p&gt;If $g$ is the log, we get&lt;/p&gt;
+
+&lt;p&gt;$$
+\vec{f_{ij}} =  \frac{2s_{ij}(z_i-z_j)}{\norm{z_i - z_j}^2(1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}
+^2)))}
+$$&lt;/p&gt;
+
+&lt;p&gt;In that case, the norm of the force is&lt;/p&gt;
+
+&lt;p&gt;$$
+\norm{\vec{f_{ij}}} = \frac{2}{\norm{z_i - z_j}(1+\exp(s_{ij} (\gamma - \norm{z_i-z_j}
+^2)))}
+$$&lt;/p&gt;
+
+&lt;p&gt;For both positive and negative edges, this one tends to $+\infty$ when the distance tends to $0$&lt;/p&gt;
+
+&lt;!-- We see that the first order derivative of the distance function has an impact on the type of force  --&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;In this article, we evaluate how the distance function in latent space models impact the form of the attractive and repulsive forces that govern the Maximum Likelihood Estimation.
+We see that depending on the form of the first order derivative of the distance function, the forces will have different behaviors when the distances go to 0 or to $\infty$&lt;/p&gt;
+
+&lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;
+</description>
+        <pubDate>Sat, 01 Oct 2022 00:00:00 -0400</pubDate>
+        <link>/articles/22/latent_space_functions</link>
+        <guid isPermaLink="true">/articles/22/latent_space_functions</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>About train-test splitting for link prediction</title>
+        <description>&lt;p&gt;In this post, we describe the link prediction task for networks, and the strategies to evaluate link prediction methods&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;Link prediction is a machine learning task that that consists in predicting missing links on an observed network. Applications of this tasks include recommender systems, friend recommendations on social media, proediction of protein-protein interaction in biology, among others.&lt;/p&gt;
+
+&lt;p&gt;A link prediction method can be seen as a score function, that takes as input an edge $e$ and yields a score $s(e) \in [0,1]$&lt;/p&gt;
+
+&lt;h1 id=&quot;evaluations-strategy&quot;&gt;Evaluations strategy&lt;/h1&gt;
+
+&lt;p&gt;We want to evaluate a Link prediction method on a given graph $G= (U,E)$, $U$ being the set of nodes in the graph and $E\subset U\times U$ the set of edges.&lt;/p&gt;
+
+&lt;h1 id=&quot;pruning---traintest-splitting&quot;&gt;Pruning - Train/test splitting&lt;/h1&gt;
+
+&lt;p&gt;The first step is to remove some of the observed edges.&lt;/p&gt;
+
+&lt;p&gt;Doing so yields a pruned graph $\newcommand{tE}{\tilde{E}}$ $\newcommand{\tG}{\tilde{G}}$ $\tG = (U,\tE)$, where $\tE\subset E$. Note that this pruned graph can be disconnected and have isolated nodes.&lt;/p&gt;
+
+&lt;p&gt;We denote $\newcommand{\mE}{E_{missing}}$$\mE$ the set of edges that were removed during this pruning operation, i.e. $\mE=E \backslash \tE$.&lt;/p&gt;
+
+&lt;p&gt;In contrast, we denote $\newcommand{\nE}{E_{neg}}$$\nE$ the set of true negative edges, i.e. the edges that were effectively not in the original graph.&lt;/p&gt;
+
+&lt;p&gt;This set is disjoint from the set of missing edges: $\nE \cap \mE = \emptyset$&lt;/p&gt;
+
+&lt;p&gt;The goal of link prediction is to score the edges that were removed from the graph higher than the edges that were not in the graph in the first place.&lt;/p&gt;
+
+&lt;p&gt;In other words, we construct a binary classification dataset composed of edges $e\in \mE \cup \nE$, and a response variable $y=1$ if $e \in \mE$ and $y=0$ else.&lt;/p&gt;
+
+&lt;h1 id=&quot;metrics&quot;&gt;Metrics&lt;/h1&gt;
+
+&lt;p&gt;Within the context described before, the missing edges can be reframed &lt;em&gt;true positive&lt;/em&gt;, while the negative edges cna be called &lt;em&gt;true negative&lt;/em&gt;. The link prediction methods can then be evaluated as a binary classifier, trying to discriminate edges that were removed during the pruning process, from edges that were already negative in the original graph.&lt;/p&gt;
+
+&lt;p&gt;Given a threshold value $\tau$, we can define a decision rule on the set of edges $e$.&lt;/p&gt;
+
+&lt;h2 id=&quot;example&quot;&gt;Example&lt;/h2&gt;
+
+&lt;p&gt;Let’s suppose that our test set is composed of 7 edges $e_1,…,e_7$, and that we set the decision threshold to $\tau=0.89$.&lt;/p&gt;
+
+&lt;p&gt;In the table below, we order the edges in order of their link prediction scores, and predict them to be positive if their score is higher than the threshold.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Edge&lt;/th&gt;
+      &lt;th&gt;$e_1$&lt;/th&gt;
+      &lt;th&gt;$e_2$&lt;/th&gt;
+      &lt;th&gt;$e_3$&lt;/th&gt;
+      &lt;th&gt;$e_4$&lt;/th&gt;
+      &lt;th&gt;$e_5$&lt;/th&gt;
+      &lt;th&gt;$e_6$&lt;/th&gt;
+      &lt;th&gt;$e_7$&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Score&lt;/td&gt;
+      &lt;td&gt;0.95&lt;/td&gt;
+      &lt;td&gt;0.94&lt;/td&gt;
+      &lt;td&gt;0.92&lt;/td&gt;
+      &lt;td&gt;0.9&lt;/td&gt;
+      &lt;td&gt;0.8&lt;/td&gt;
+      &lt;td&gt;0.79&lt;/td&gt;
+      &lt;td&gt;0.73&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Label&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Prediction&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;As we can see, using this threshold, we have selected $P(\tau)=4$ edges as positive.&lt;/p&gt;
+
+&lt;p&gt;Among these 4 edges:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;$e_1$, $e_2$ and $e_3$ are correctly labeled as positive (namely ) so the number of true positives is $TP(\tau)=3$.&lt;/li&gt;
+  &lt;li&gt;$e_4$ is wrongly labeled as positive, so the number of false positives is $FP(\tau)=1$.&lt;/li&gt;
+  &lt;li&gt;$e_6$ is wrongly labeled as negative, so the number of false negative is $FP(\tau)=1$.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Based on these rate, we can derive the following confusion matrix: &lt;label for=&quot;note&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;note&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Note that all the values above are piecewise constant functions of the decision threshold, where the cutoff points are the score values of each samples. &lt;/span&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt; &lt;/th&gt;
+      &lt;th&gt;Predicted Positive&lt;/th&gt;
+      &lt;th&gt;Predicted Negative&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Positive&lt;/td&gt;
+      &lt;td&gt;TP=3&lt;/td&gt;
+      &lt;td&gt;FN=1&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Negative&lt;/td&gt;
+      &lt;td&gt;FP=1&lt;/td&gt;
+      &lt;td&gt;TN=2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&quot;precision-and-recall&quot;&gt;Precision and Recall&lt;/h3&gt;
+
+&lt;p&gt;The precision is the ratio of positively predicted edges that have a positive ground truth label.&lt;/p&gt;
+
+&lt;p&gt;The recall is the percentage of edges having a ground truth positive label that were effectively classified, or “recalled” as positive.&lt;/p&gt;
+
+&lt;p&gt;To remind of these notions, one can think of the score as the result of a search on Google. Given a query term, Google looks for most relevant articles and returns them, ordered by relevance. One can then select the first $K$ of these articles, and decide whether they are actually relevant or not (i.e. the ground truth is given by the user). The precision score tells us how precise the results are, ensuring that Google doesn’t yield too many unrelevant articles. The recall on the other hand, ensures that Google will give a high rank to a good proportion of the articles that are relevant for the user.&lt;/p&gt;
+
+&lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;
+</description>
+        <pubDate>Fri, 25 Mar 2022 00:00:00 -0400</pubDate>
+        <link>/articles/22/on_link_prediction</link>
+        <guid isPermaLink="true">/articles/22/on_link_prediction</guid>
+        
+        
+      </item>
     
       <item>
         <title>The Expectation-Maximization algorithm</title>
@@ -201,7 +500,7 @@ $$&lt;/p&gt;
 KL(q\vert \vert p(.\vert x)) &amp;amp;=
 \int\limits \log(\frac{q(z)}{p(z \vert x)}) q(z) dz \\ &amp;amp;=
 \int\limits \log(\frac{p(x)q(z)}{p(x,z)}) q(z) dz \\ &amp;amp;=
-p(x) - \int\limits \log(\frac{p(x,z)}{q(z)}) q(z) dz \\ &amp;amp;=
+log(p(x)) - \int\limits \log(\frac{p(x,z)}{q(z)}) q(z) dz \\ &amp;amp;=
 log(p(x)) - F(x,q)
 \end{aligned}
 $$&lt;/p&gt;
