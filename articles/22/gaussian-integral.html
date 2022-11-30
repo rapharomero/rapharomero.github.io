@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>🧮 The Change Of Variable Formula and the Gaussian Integral</title>
+  <meta name="description" content="In this post, I present a simple way to calculate the Gaussian Integral, that is a very appealing application of the change of variable formula.">
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  
+    <link href="//fonts.googleapis.com/css?family=Lato:400,400italic" rel="stylesheet" type="text/css">
+  
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <script>
+    let options = {
+      delimiters: [
+        { left: "$", right: "$", display: false },
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
+      ]
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, options);
+    });
+
+</script>
+
+  
+
+
+  <link rel="stylesheet" type="text/css" href="/css/tufte.css">
+  <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="/articles/22/gaussian-integral">
+
+  <link rel="alternate" type="application/rss+xml" title="Raphaël's research website" href="/feed.xml">
+<script>MathJax={"tex":{"inlineMath":[["$","$"],["\\(","\\)"]],"displayMath":[["$$","$$"],["\\[","\\]"]]},"svg":{"fontCache":"global"}}</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	<!-- <a href="/"><img class="badge" src="/assets/img/badge_1.png" alt="CH"></a> -->
+	
+		
+  	
+		
+		    
+		      <a href="/">Home</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/posts">Posts</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>The Change Of Variable Formula and the Gaussian Integral</h1>
+<p class="subtitle">November 30, 2022</p>
+
+<p>In this post, I present a simple way to calculate the Gaussian Integral, that is a very appealing application of the change of variable formula.</p>
+
+<!--more-->
+
+<h1 id="the-gaussian-integral">The Gaussian Integral</h1>
+
+<p>The Gaussian Integral is a very important result that gives the value of the integral $$I=\int\limits_{-\infty}^{\infty} e^{-t^2} dt=\sqrt{\pi}$$.</p>
+
+<p>This integral is famous since it relates two important constants $e$ and $\pi$.
+Moreover, it is widely used for instance in probability theory, as it is the partition function of the standard Normal Distribution $\mathcal{N}(0,1)$.</p>
+
+<p>However, it can be shown that it is impossible to integrate this using simple functions. In this article I will describe how a simple trick allows to calculate it in a few lines of derivations.</p>
+
+<h1 id="the-jacobian-and-the-jacobian-matrix">The Jacobian and the Jacobian Matrix</h1>
+
+<p>Let $\mathcal{U}$ and $\mathcal{V}$ be two open subsets of $\mathbb{R}^n$ and $\mathbb{R}^m$ respectively and $\phi:\mathcal{V}\rightarrow\mathcal{U}$ be a differentiable map between them.</p>
+
+<p>$\phi$ maps every vector $v=(v_1,…,v_m)\in \mathcal{V}$ to a unique vector $\phi(v)=u=(u_1,…,u_n)\in \mathcal{U}$.</p>
+
+<p>The <strong>Jacobian Matrix</strong> of $\phi$ at point $v$, denoted $J_{\phi}(v)$ is the matrix whose entries $J_{\phi}^{i,j}(v)$, is the infinitesimal difference on the $i$-th output $u_i$ of $\phi$ obtained by applying an infinitesimal change to the $j$-th output $v_j$.</p>
+
+<p>In mathematical terms we have $J_{\phi}(v) = (\frac{\partial u_i}{\partial v_j})_{i,j}$.</p>
+
+<p>The <strong>Jacobian</strong> is the determinant of the Jacobian Matrix, i.e. $Jac_\phi(v) =det(J_{\phi}(v))$.
+The Jacobian has an important geometrical interpretation.</p>
+
+<p>Indeed, the $j$-th column of the Jacobian Matrix contains the coordinates of the image of the canonical basis vectors $e_1,…,e_j$ of $\mathbb{R}^m$ through a first order approximation of $\phi$ around $v$.
+The images of these basis vector form a signed hypervolume in the space $\mathbb{R}^n$, whose value is given specifically by $det(J_{\phi}(v))$.</p>
+
+<p>Thus, the Jacobian tells us by how much the unit volume of hypercube in $\mathbb{R}^m$ is stretched when passed through the linear transformation $J_{\phi}(v)$.</p>
+
+<h1 id="the-change-of-variable-formula">The Change of Variable Formula.</h1>
+
+<p>Let’s suppose that we want to cal.culate an integral of a real-valued continuous function $f$ over an open set $\mathcal{U}$ of a measured space $(\mathcal{X}, \mu)$ :
+$$\int\limits_{u\in\mathcal{U}} f(u)\mu(du),$$ but that there’s no easy way to do this due to a discrepancy between the structure of $\mathcal{U}$ and the form of $f$.</p>
+
+<p>Suppose moreover that there exists another open set $\mathcal{V}$ on a space $(\mathcal{Z}, \nu)$ and a continuously differentiable map $\phi:\mathcal{V}\rightarrow\mathcal{U}$ between the two sets.</p>
+
+<p>Then we have</p>
+
+<p>$$
+\int\limits_{u\in\mathcal{U}} f(u)\mu(du) =
+\int\limits_{v\in\mathcal{V}} f\circ\phi(v)  Jac_\phi(v) \nu(dv)
+$$</p>
+
+<p>In this expression, $Jac_{\phi}(v)$ is the Jacobian of $\phi$ around $v$.</p>
+
+<p>This tells us that we can compute the integral in the space $\mathcal{Z}$ if it is simpler, provided that we rescale the differential by the Jacobian.</p>
+
+<h2 id="example-the-polar-coordinates">Example: the polar coordinates</h2>
+
+<p>The polar coordinates system allows describing points in $\mathbb{R}^2$ not as a pair of Cartesian coordinates but instead using a radius and an angle.</p>
+
+<p>It is represented by the transformation $\phi:(u,v)\mapsto (u.cos(\theta), v.sin(\theta))$, or its inverse transformation $\psi:(x,y)\mapsto(\sqrt{x^2+y^2},arctan(\vert\frac{y}{x}\vert))$</p>
+
+<p>The Jacobian of $\phi$ has the very simple form $Jac_{\phi}(u,\theta) = u$.</p>
+
+<p>For any integrable function $f :\mathbb{R}^2 \rightarrow \mathbb{R}$ such that the integral $\int\limits f(x,y)dxdy$ exists, the following holds:</p>
+
+<p>$$
+\int f(x,y)dxdy =\int f\circ \phi(u,\theta) u du d\theta
+$$</p>
+
+<p>Intuitively, if we want to use the polar coordinates instead of the Cartesian ones, we just need to scale the differential $dxdy$ by a factor $u$.</p>
+
+<p>One can think of $dxdy$ (resp. $du d\theta$) as the volume of the parallelogram obtained from the pair of vectors $(dx \vec{e_x}, dy \vec{e_y})$ (respectively $(du \vec{e_u}, d\theta \vec{e_\theta})$), where $\vec{e_{.}}$ are the unit vectors of the canonical basis of each coordinate spaces.</p>
+
+<p>Virtually, the change of variable formula tells us how these volumes relate to each other, provided that we know a differentiable transformation going from one space to the other.</p>
+
+<h1 id="application-to-the-gaussian-integral">Application to the Gaussian Integral.</h1>
+
+<p>To apply the previous result to the Gaussian Integral $I=\int\limits_{-\infty}^{\infty} e^{-t^2} dt$, we will look instead at a similar integral but in dimension 2:</p>
+
+<p>$$
+J=\int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty} e^{-(x^2+y^2)} dx dy.
+$$</p>
+
+<p>Surprisingly, this integral will show to be easier to calculate. Moreover, using Fubini’s theorem, we can easily show that</p>
+
+<p>$$
+J
+=\int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty} e^{-(x^2+y^2)} dx dy
+=\int\limits_{-\infty}^{\infty} e^{-x^2} dx \int\limits_{-\infty}^{\infty}e^{-y^2}dy
+= I^2
+$$</p>
+
+<p>Now in order to calculate it, we first realize that if we denote $S_R =[-R,R]^2$ the square of size $R$ for any $R&gt;0$, and $J_R= \int\limits_{S_R} e^{-(x^2+y^2)} dx dy$, we have:</p>
+
+<p>$$
+J= lim_{R \rightarrow \infty} J_R
+$$</p>
+
+<p>Moreover, since the diagonal of the square $S_R$ has length $\sqrt{2} R$, if we denote $D_R = \{ (x,y)\vert x^2+y^2 \leq R^2\}$ the disk of radius $R$, we have that $D_R \subset S_R \subset D_{\sqrt{2}R}$.</p>
+
+<p>Hence, denoting $K_R= \int\limits_{D_R} e^{-(x^2+y^2)} dx dy$, we have</p>
+
+<p>$$K_R \leq J_{R} \leq K_{\sqrt{2}R}.$$</p>
+
+<p>Now we will show that $K_R \rightarrow \pi$ when $R \rightarrow \infty$, as a consequence, $J_R$ will also tend to $\pi$ since it is surrounded by expressions that tend to $\pi$.</p>
+
+<p>This is where the change of variable formula comes at play. Indeed, we will express the integral in polar coordinates.
+Indeed, denoting $(x,y)=\phi(u,\theta) = (u.cos(\theta), u.sin(\theta))$ and $f(x,y)=e^{-(x^2+y^2)}$
+we have that $$\int f(x,y) dxdy = \int f\circ \phi (u,\theta) Jac_{\phi}(u,\theta) du d\theta$$</p>
+
+<p>Thus:</p>
+
+<p>$$
+\begin{aligned}K_R &amp;= \int\limits_{D_R} e^{-(x^2+y^2)} dx dy \\ &amp;=
+\int\limits_{[0,R[\times [0,2\pi[} e^{-r^2} r dr d\theta  \\ &amp;=
+\frac{1}{2}\int\limits_{[0,\sqrt{R}[\times [0,2\pi[} e^{-s} ds d\theta\\ &amp;=
+\pi (1-e^{-R})<br>
+\end{aligned}
+$$</p>
+
+<p>So $K_{R}\rightarrow \pi$ when $R \rightarrow \infty$.</p>
+
+<p>This shows that $I=\sqrt{\pi}$</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>We have seen that the change of variable formula is a powerful tool to calculate integrals that don’t have closed forms.
+The Jacobian allows to express the ratio between the infinitesimal volume used in the integrals.
+This technique can be applied to calculate seemingly complicated integrals in a few lines.
+This change of variable formula has been used extensively in Machine Learning, especially in the reparametrization of distributions in Representation Learning.</p>
+
+<p>For instance Normalizing Flows or Variational Autoencoders rely heavily on it.</p>
+
+<ol class="bibliography"></ol>
+
+
+
+    </article>
+    <span class="print-footer">The Change Of Variable Formula and the Gaussian Integral - November 30, 2022 - raphael romero</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+    <li><a href="mailto:hate@spam.net"><span class="icon-mail3"></span></a></li>    
+    
+      <li>
+        <a href="//www.twitter.com/twitter_handle"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//plus.google.com/+googlePlusName"><span class="icon-google2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/GithubHandle"><span class="icon-github"></span></a>
+      </li>
+    
+      <li>
+        <a href="//www.flickr.com/photos/FlickrUserID"><span class="icon-flickr3"></span></a>
+      </li>
+    
+      <li>
+        <a href="/feed"><span class="icon-rss2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//vimeo.com/vimeo-id"><span class="icon-vimeo2"></span></a>
+      </li>
+    
+      <li>
+        <a href="//www.linkedin.com/"><span class="icon-linkedin"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>© 2022   RAPHAEL ROMERO</span> <br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for Content-centric blogging </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+  </body>
+</html>

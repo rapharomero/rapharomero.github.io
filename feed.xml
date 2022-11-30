@@ -5,9 +5,147 @@
     <description></description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 20 Oct 2022 08:00:49 -0400</pubDate>
-    <lastBuildDate>Thu, 20 Oct 2022 08:00:49 -0400</lastBuildDate>
+    <pubDate>Wed, 30 Nov 2022 07:37:38 -0500</pubDate>
+    <lastBuildDate>Wed, 30 Nov 2022 07:37:38 -0500</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
+    
+      <item>
+        <title>The Change Of Variable Formula and the Gaussian Integral</title>
+        <description>&lt;p&gt;In this post, I present a simple way to calculate the Gaussian Integral, that is a very appealing application of the change of variable formula.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;the-gaussian-integral&quot;&gt;The Gaussian Integral&lt;/h1&gt;
+
+&lt;p&gt;The Gaussian Integral is a very important result that gives the value of the integral $$I=\int\limits_{-\infty}^{\infty} e^{-t^2} dt=\sqrt{\pi}$$.&lt;/p&gt;
+
+&lt;p&gt;This integral is famous since it relates two important constants $e$ and $\pi$.
+Moreover, it is widely used for instance in probability theory, as it is the partition function of the standard Normal Distribution $\mathcal{N}(0,1)$.&lt;/p&gt;
+
+&lt;p&gt;However, it can be shown that it is impossible to integrate this using simple functions. In this article I will describe how a simple trick allows to calculate it in a few lines of derivations.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-jacobian-and-the-jacobian-matrix&quot;&gt;The Jacobian and the Jacobian Matrix&lt;/h1&gt;
+
+&lt;p&gt;Let $\mathcal{U}$ and $\mathcal{V}$ be two open subsets of $\mathbb{R}^n$ and $\mathbb{R}^m$ respectively and $\phi:\mathcal{V}\rightarrow\mathcal{U}$ be a differentiable map between them.&lt;/p&gt;
+
+&lt;p&gt;$\phi$ maps every vector $v=(v_1,…,v_m)\in \mathcal{V}$ to a unique vector $\phi(v)=u=(u_1,…,u_n)\in \mathcal{U}$.&lt;/p&gt;
+
+&lt;p&gt;The &lt;strong&gt;Jacobian Matrix&lt;/strong&gt; of $\phi$ at point $v$, denoted $J_{\phi}(v)$ is the matrix whose entries $J_{\phi}^{i,j}(v)$, is the infinitesimal difference on the $i$-th output $u_i$ of $\phi$ obtained by applying an infinitesimal change to the $j$-th output $v_j$.&lt;/p&gt;
+
+&lt;p&gt;In mathematical terms we have $J_{\phi}(v) = (\frac{\partial u_i}{\partial v_j})_{i,j}$.&lt;/p&gt;
+
+&lt;p&gt;The &lt;strong&gt;Jacobian&lt;/strong&gt; is the determinant of the Jacobian Matrix, i.e. $Jac_\phi(v) =det(J_{\phi}(v))$.
+The Jacobian has an important geometrical interpretation.&lt;/p&gt;
+
+&lt;p&gt;Indeed, the $j$-th column of the Jacobian Matrix contains the coordinates of the image of the canonical basis vectors $e_1,…,e_j$ of $\mathbb{R}^m$ through a first order approximation of $\phi$ around $v$.
+The images of these basis vector form a signed hypervolume in the space $\mathbb{R}^n$, whose value is given specifically by $det(J_{\phi}(v))$.&lt;/p&gt;
+
+&lt;p&gt;Thus, the Jacobian tells us by how much the unit volume of hypercube in $\mathbb{R}^m$ is stretched when passed through the linear transformation $J_{\phi}(v)$.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-change-of-variable-formula&quot;&gt;The Change of Variable Formula.&lt;/h1&gt;
+
+&lt;p&gt;Let’s suppose that we want to cal.culate an integral of a real-valued continuous function $f$ over an open set $\mathcal{U}$ of a measured space $(\mathcal{X}, \mu)$ :
+$$\int\limits_{u\in\mathcal{U}} f(u)\mu(du),$$ but that there’s no easy way to do this due to a discrepancy between the structure of $\mathcal{U}$ and the form of $f$.&lt;/p&gt;
+
+&lt;p&gt;Suppose moreover that there exists another open set $\mathcal{V}$ on a space $(\mathcal{Z}, \nu)$ and a continuously differentiable map $\phi:\mathcal{V}\rightarrow\mathcal{U}$ between the two sets.&lt;/p&gt;
+
+&lt;p&gt;Then we have&lt;/p&gt;
+
+&lt;p&gt;$$
+\int\limits_{u\in\mathcal{U}} f(u)\mu(du) =
+\int\limits_{v\in\mathcal{V}} f\circ\phi(v)  Jac_\phi(v) \nu(dv)
+$$&lt;/p&gt;
+
+&lt;p&gt;In this expression, $Jac_{\phi}(v)$ is the Jacobian of $\phi$ around $v$.&lt;/p&gt;
+
+&lt;p&gt;This tells us that we can compute the integral in the space $\mathcal{Z}$ if it is simpler, provided that we rescale the differential by the Jacobian.&lt;/p&gt;
+
+&lt;h2 id=&quot;example-the-polar-coordinates&quot;&gt;Example: the polar coordinates&lt;/h2&gt;
+
+&lt;p&gt;The polar coordinates system allows describing points in $\mathbb{R}^2$ not as a pair of Cartesian coordinates but instead using a radius and an angle.&lt;/p&gt;
+
+&lt;p&gt;It is represented by the transformation $\phi:(u,v)\mapsto (u.cos(\theta), v.sin(\theta))$, or its inverse transformation $\psi:(x,y)\mapsto(\sqrt{x^2+y^2},arctan(\vert\frac{y}{x}\vert))$&lt;/p&gt;
+
+&lt;p&gt;The Jacobian of $\phi$ has the very simple form $Jac_{\phi}(u,\theta) = u$.&lt;/p&gt;
+
+&lt;p&gt;For any integrable function $f :\mathbb{R}^2 \rightarrow \mathbb{R}$ such that the integral $\int\limits f(x,y)dxdy$ exists, the following holds:&lt;/p&gt;
+
+&lt;p&gt;$$
+\int f(x,y)dxdy =\int f\circ \phi(u,\theta) u du d\theta
+$$&lt;/p&gt;
+
+&lt;p&gt;Intuitively, if we want to use the polar coordinates instead of the Cartesian ones, we just need to scale the differential $dxdy$ by a factor $u$.&lt;/p&gt;
+
+&lt;p&gt;One can think of $dxdy$ (resp. $du d\theta$) as the volume of the parallelogram obtained from the pair of vectors $(dx \vec{e_x}, dy \vec{e_y})$ (respectively $(du \vec{e_u}, d\theta \vec{e_\theta})$), where $\vec{e_{.}}$ are the unit vectors of the canonical basis of each coordinate spaces.&lt;/p&gt;
+
+&lt;p&gt;Virtually, the change of variable formula tells us how these volumes relate to each other, provided that we know a differentiable transformation going from one space to the other.&lt;/p&gt;
+
+&lt;h1 id=&quot;application-to-the-gaussian-integral&quot;&gt;Application to the Gaussian Integral.&lt;/h1&gt;
+
+&lt;p&gt;To apply the previous result to the Gaussian Integral $I=\int\limits_{-\infty}^{\infty} e^{-t^2} dt$, we will look instead at a similar integral but in dimension 2:&lt;/p&gt;
+
+&lt;p&gt;$$
+J=\int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty} e^{-(x^2+y^2)} dx dy.
+$$&lt;/p&gt;
+
+&lt;p&gt;Surprisingly, this integral will show to be easier to calculate. Moreover, using Fubini’s theorem, we can easily show that&lt;/p&gt;
+
+&lt;p&gt;$$
+J
+=\int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty} e^{-(x^2+y^2)} dx dy
+=\int\limits_{-\infty}^{\infty} e^{-x^2} dx \int\limits_{-\infty}^{\infty}e^{-y^2}dy
+= I^2
+$$&lt;/p&gt;
+
+&lt;p&gt;Now in order to calculate it, we first realize that if we denote $S_R =[-R,R]^2$ the square of size $R$ for any $R&amp;gt;0$, and $J_R= \int\limits_{S_R} e^{-(x^2+y^2)} dx dy$, we have:&lt;/p&gt;
+
+&lt;p&gt;$$
+J= lim_{R \rightarrow \infty} J_R
+$$&lt;/p&gt;
+
+&lt;p&gt;Moreover, since the diagonal of the square $S_R$ has length $\sqrt{2} R$, if we denote $D_R = \{ (x,y)\vert x^2+y^2 \leq R^2\}$ the disk of radius $R$, we have that $D_R \subset S_R \subset D_{\sqrt{2}R}$.&lt;/p&gt;
+
+&lt;p&gt;Hence, denoting $K_R= \int\limits_{D_R} e^{-(x^2+y^2)} dx dy$, we have&lt;/p&gt;
+
+&lt;p&gt;$$K_R \leq J_{R} \leq K_{\sqrt{2}R}.$$&lt;/p&gt;
+
+&lt;p&gt;Now we will show that $K_R \rightarrow \pi$ when $R \rightarrow \infty$, as a consequence, $J_R$ will also tend to $\pi$ since it is surrounded by expressions that tend to $\pi$.&lt;/p&gt;
+
+&lt;p&gt;This is where the change of variable formula comes at play. Indeed, we will express the integral in polar coordinates.
+Indeed, denoting $(x,y)=\phi(u,\theta) = (u.cos(\theta), u.sin(\theta))$ and $f(x,y)=e^{-(x^2+y^2)}$
+we have that $$\int f(x,y) dxdy = \int f\circ \phi (u,\theta) Jac_{\phi}(u,\theta) du d\theta$$&lt;/p&gt;
+
+&lt;p&gt;Thus:&lt;/p&gt;
+
+&lt;p&gt;$$
+\begin{aligned}K_R &amp;amp;= \int\limits_{D_R} e^{-(x^2+y^2)} dx dy \\ &amp;amp;=
+\int\limits_{[0,R[\times [0,2\pi[} e^{-r^2} r dr d\theta  \\ &amp;amp;=
+\frac{1}{2}\int\limits_{[0,\sqrt{R}[\times [0,2\pi[} e^{-s} ds d\theta\\ &amp;amp;=
+\pi (1-e^{-R})&lt;br /&gt;
+\end{aligned}
+$$&lt;/p&gt;
+
+&lt;p&gt;So $K_{R}\rightarrow \pi$ when $R \rightarrow \infty$.&lt;/p&gt;
+
+&lt;p&gt;This shows that $I=\sqrt{\pi}$&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;We have seen that the change of variable formula is a powerful tool to calculate integrals that don’t have closed forms.
+The Jacobian allows to express the ratio between the infinitesimal volume used in the integrals.
+This technique can be applied to calculate seemingly complicated integrals in a few lines.
+This change of variable formula has been used extensively in Machine Learning, especially in the reparametrization of distributions in Representation Learning.&lt;/p&gt;
+
+&lt;p&gt;For instance Normalizing Flows or Variational Autoencoders rely heavily on it.&lt;/p&gt;
+
+&lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;
+</description>
+        <pubDate>Wed, 30 Nov 2022 00:00:00 -0500</pubDate>
+        <link>/articles/22/gaussian-integral</link>
+        <guid isPermaLink="true">/articles/22/gaussian-integral</guid>
+        
+        
+      </item>
     
       <item>
         <title>Investigating Different distance function for Latent Distance graph models</title>
@@ -419,6 +557,72 @@ $$&lt;/p&gt;
 
 &lt;p&gt;This step is thus called the &lt;strong&gt;Maximization step&lt;/strong&gt;.&lt;/p&gt;
 
+&lt;h1 id=&quot;example-the-gaussian-mixture-model&quot;&gt;Example: the Gaussian Mixture Model.&lt;/h1&gt;
+
+&lt;p&gt;In the Gaussian Mixture Model, we are given a dataset $x={x_1,…,x_n}$, and our goal is to assign a cluster label $c_i\in\{1,…,K\}$ to each datapoint.&lt;/p&gt;
+
+&lt;p&gt;To do so, an unobserved cluster assignment variable $z_i \in \{1,…,K\}$ is introduced.&lt;/p&gt;
+
+&lt;p&gt;Moreover, each cluster $k\in \{1,…,K\}$ is associated with a Gaussian Distribution $\mathcal{N}(\mu_k, \Sigma_k)$.&lt;/p&gt;
+
+&lt;p&gt;Given this, we assume the following generating process for the datapoints:&lt;/p&gt;
+
+&lt;p&gt;$$
+\begin{aligned}
+z_i &amp;amp;\sim \mathcal{M}(1, (\lambda_1,…,\lambda_K)) \\ x_i\vert z_i=k &amp;amp;\sim \mathcal{N}(\mu_k, \Sigma_k)
+\end{aligned}
+$$&lt;/p&gt;
+
+&lt;p&gt;The goal is to find the set of parameters
+$\theta=(\lambda_1,…,\lambda_K, \mu_1,…,\mu_K, \Sigma_1,…,\Sigma_K )$ that maximizes the likelihood $ p(x| \theta) $.&lt;/p&gt;
+
+&lt;h3 id=&quot;e-step&quot;&gt;E-step&lt;/h3&gt;
+
+&lt;p&gt;As mentionned before, in the E-step we will compute a surrogate function that is the expectation for $z$ distributed under the its conditional distribution given the data and the current set of parameters $\theta^{t}$&lt;/p&gt;
+
+&lt;p&gt;Using Bayes’ Rule, we get that this distribution is&lt;/p&gt;
+
+&lt;p&gt;$$
+\alpha_{i,k}^{t} \overset{\Delta}{=} p(z_i=k|x_i, \theta^{t}) = \frac{\mathcal{N}(x_i;\mu_k^{t}, \Sigma_k^{t})}{\sum_{k’=1}^{K}\mathcal{N}(x_i;\mu_{k’}^{t}, \Sigma_{k’}^{t})}
+$$&lt;/p&gt;
+
+&lt;p&gt;We deduce that the surrogate function to maximize is&lt;/p&gt;
+
+&lt;p&gt;$$E(\theta)= \sum_{i=1}^{n} \sum_{k=1}^{K} \alpha_{k,i}^{t}\left[ log(\lambda_k)+\log(\mathcal{N}(x_i;\mu_k,\Sigma_k)) \right]$$&lt;/p&gt;
+
+&lt;p&gt;Note that this maximization has to be done on the set of admissible parameters.
+In particular, we should have $\sum_{k=1}^{K}\lambda_k = 1$.&lt;/p&gt;
+
+&lt;h3 id=&quot;m-step&quot;&gt;M-step&lt;/h3&gt;
+
+&lt;p&gt;In the M-step, we maximize the surrogate function derived at the E-step, with respect to the model parameters.
+In the case of the Gaussian Mixture Model, this has a closed form that writes as follows.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Maximizing $E(\theta)$ with respect to $\lambda_1,…,\lambda_K$ under the constraint $\sum_{k=1}^{K}\lambda_k = 1$ yields :&lt;/p&gt;
+
+    &lt;p&gt;$$
+\lambda_{k}^{t+1} = \frac{1}{n}\sum_{i=1}^{n}\alpha_{i,k}^{t}
+$$&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Maximizing $E(\theta)$ with respect to $\mu_1,…,\mu_{K}$ yields the following re-weighted empirical mean of the data points in each clusters:&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;$$
+\mu_{k}^{t+1} = \frac{\sum_{i=1}^n\alpha_{i,k}^{t}x_i}{\sum_{i=1}^n\alpha_{i,k}^{t}}
+$$&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Similarly&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;$$
+\Sigma_{k}^{t+1} = \frac{\sum_{i=1}^n\alpha_{i,k}^{t}(x_i-\mu_k^{t+1})(x_i-\mu_k^{t+1})^T}{\sum_{i=1}^n\alpha_{i,k}^{t}}
+$$&lt;/p&gt;
+
 &lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
 
 &lt;p&gt;In this article we have presented the Expectation-Maximization algorithm and its close connection with variational methods. While its name suggest otherwise, this algorithm is simply a form of alternate optimization of the Variational Free Energy, with respect to the model parameters on the one hand, and a variational distribution defined on the latent space on the other hand.&lt;/p&gt;
@@ -694,7 +898,7 @@ $$&lt;/p&gt;
 
 &lt;p&gt;$$
 \begin{aligned}
-p_{\mathcal{N}_{+}(.\vert s)}(d) = \sqrt{\frac{2}{\pi s^2}} exp(- \frac{d^2}{2 d^2})
+p_{\mathcal{N}_{+}(.\vert s)}(d) = \sqrt{\frac{2}{\pi s^2}} exp(- \frac{d^2}{2 s^2})
 \end{aligned}
 $$&lt;/p&gt;
 
