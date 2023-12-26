@@ -1,8 +1,8 @@
 <html>
 <!-- Title -->
-<h1>
+<!-- <h1>
 	Temporal Graph Builder
-</h1>
+</h1> -->
 <style>
 	body {
 		display: flex;
@@ -115,20 +115,22 @@
 	// ctx.scale(scale, scale)
 	var yscale = 1.0;
 	var spaceBetweenNodes = 100;
-	var nodeSize = 10;
-	var yTimeAxis = canvas.height - 30;
-
+	var nodeSize = 6;
+	var yTimeAxis = canvas.height - 10;
+	calculateNodeY();
 	function calculateNodeY() {
 		var maxId = Math.max(...nodes.map((node) => node.id));
-		potentialMaxY = maxId * spaceBetweenNodes;
+		var potentialMaxY = (maxId + 1) * spaceBetweenNodes;
 		if (potentialMaxY > canvas.height - 10) {
-			scaleFactor = (canvas.height - 10) / potentialMaxY;
-			yscale = yscale * scaleFactor;
-			nodeSize = nodeSize * scaleFactor;
+			spaceBetweenNodes = canvas.height / (maxId + 1);
+			// scaleFactor = spaceBetweenNodes / oldSpaceBetweenNodes;
+			// nodeSize = scaleFactor * 6;
+			console.log("spaceBetweenNodes", spaceBetweenNodes);
 		}
 		nodes.forEach((node) => {
 			node.y = node.id * spaceBetweenNodes * yscale;
 		});
+		// yTimeAxis = nodes[nodes.length - 1].y + spaceBetweenNodes * yscale;
 	}
 
 	const addButton = document.getElementById('addNodeButton');
@@ -196,7 +198,7 @@
 
 
 	var hoveredNode = null;
-	var xOrigin = 100;
+	var xOrigin = 10;
 	var tmin = 50;
 	var timeStepSize = 5;
 	// var tmin = 0;
@@ -218,6 +220,7 @@
 		ctx.lineTo(x, y + height);
 		ctx.stroke();
 	}
+
 	function drawVerticalDashedLine(x, y, height) {
 		ctx.beginPath();
 		ctx.setLineDash([5, 5]); // 5px dashes, 5px gaps
@@ -241,6 +244,23 @@
 		ctx.strokeStyle = 'black'; // Set to default color
 	}
 
+
+	function drawLoopFromTo(x, y, color = "black") {
+		var radius = 10;
+		centerX = x;
+		centerY = y - radius;
+
+		ctx.beginPath();
+		// ctx.setLineDash([5, 5]); // Set the line dash pattern (5 pixels on, 5 pixels off)
+		ctx.strokeStyle = color; // Set to default color
+
+		ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+
+		ctx.stroke();
+		// ctx.setLineDash([]); // Reset the line dash pattern
+		ctx.closePath();
+		ctx.strokeStyle = 'black'; // Set to default color
+	}
 	function drawTemporalEvent(interaction) {
 		var srcNode = nodes.find((node) => node.id === interaction.src);
 		var dstNode = nodes.find((node) => node.id === interaction.dst);
@@ -255,6 +275,12 @@
 			ctx.beginPath();
 			ctx.arc(x, node.y, nodeSize, 0, Math.PI * 2, true);
 			ctx.fill();
+		}
+		if (srcNode.id === dstNode.id) {
+			// Draw a dashed loop
+			drawLoopFromTo(x, y1, srcNode.color);
+			drawNodeEvent(srcNode);
+			return;
 		}
 		// Draw a vertical line connecting the nodes at time t
 		ctx.beginPath();
@@ -286,7 +312,6 @@
 		// Draw Node Labels
 		ctx.font = "20px Arial";
 		function drawNodeLabel(node) {
-			// 
 			ctx.fillStyle = node.color;
 			ctx.fillText(node.id, tmin - 40, node.y);
 		}
@@ -323,6 +348,8 @@
 		ctx.stroke();
 		ctx.setLineDash([]); // Reset line dash
 	}
+
+
 	canvas.addEventListener('mousemove', function (event) {
 		var rect = canvas.getBoundingClientRect();
 		var mouseX = event.clientX - rect.left;
@@ -345,19 +372,14 @@
 			ctx.fillText(t, mouseX + 10, yTimeAxis);
 			// Draw a vertical line
 			ctx.lineWidth = 0.5;
+			console.log("mouseX", mouseX);
+			console.log("xOrigin", xOrigin);
 			drawVerticalDashedLine(mouseX, xOrigin, yTimeAxis);
 			ctx.lineWidth = 1;
 		}
 
 		if (isSourceNodeClicked) {
-			// Draw a vertical line
-			console.log(sourceNode);
 			drawCurvedLine(mouseX, sourceNode.y, mouseX, mouseY);
-			// Draw a line connecting the source node to the mouse
-			// ctx.beginPath();
-			// ctx.moveTo(sourceNode.x, sourceNode.y);
-			// ctx.lineTo(mouseX, mouseY);
-			// ctx.stroke();
 		}
 	});
 
@@ -386,7 +408,6 @@
 			interactions.push({ src: sourceNode.id, dst: destinationNode.id, t: t, index: index });
 
 			// Look at how many interaction times are smaller than t
-
 
 			// Reset the flags
 			isSourceNodeClicked = false;
