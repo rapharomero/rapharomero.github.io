@@ -1,0 +1,408 @@
+<html>
+<!-- Title -->
+<h1>
+	Temporal Graph Builder
+</h1>
+<style>
+	body {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+	}
+
+	canvas {
+		/*border: 1px solid #000;*/
+		margin-right: 10px;
+		/* Adjust the margin as needed */
+	}
+
+	table {
+		border-collapse: collapse;
+		width: 50%;
+	}
+
+	table,
+	th,
+	td {
+		border: 1px solid #ddd;
+	}
+
+	th,
+	td {
+		padding: 12px;
+		text-align: left;
+	}
+
+	th {
+		background-color: #f2f2f2;
+	}
+</style>
+<div>
+	<button id="addNodeButton">Add Node</button>
+	<button id="reset">Reset</button>
+	<!-- <button id="exportCSV">Export CSV</button> -->
+	<!-- <a href="temporal_graph.csv">Download CSV</a> -->
+	<canvas id="gameCanvas" width="600" height="600"></canvas>
+</div>
+<div>
+	<textarea id="csvTextArea" rows="30" cols="40" readonly></textarea>
+	<button id="copyToClipboardButton" onclick="copyToClipboard()">Copy to Clipboard</button>
+	<!-- <h2>Temporal Graph Table</h2> -->
+	<!-- <table id="graphTable">
+		<thead>
+			<tr>
+				<th>Source Node</th>
+				<th>Destination Node</th>
+				<th>Timestamp</th>
+			</tr>
+		</thead>
+		<tbody>
+			Table content will be dynamically added here
+		</tbody>
+	</table> -->
+
+</div>
+<script>
+	var canvas;
+	var tableCanvas;
+	var ctx;
+
+	var nodes = [
+		{ id: 1, y: 100, color: 'red', size: 10, },
+		{ id: 2, y: 200, color: 'blue', size: 10 },
+	];
+	var interactions = [
+		{ src: 1, dst: 2, t: 0, index: 0 },
+		// Add more interactions as needed
+	];
+	var rowNewCell;
+
+	function updateTable() {
+		const tableBody = document.querySelector('#graphTable tbody');
+		var tableRows = tableBody.rows.length;
+		if (tableRows > 0) {
+			for (var i = tableRows - 1; i >= 0; i--) {
+				tableBody.deleteRow(i);
+			}
+		}
+
+		// empty body
+		interactions.forEach((interaction) => {
+			const row = tableBody.insertRow(interaction.index);
+			const cell1 = row.insertCell(0);
+			const cell2 = row.insertCell(1);
+			const cell3 = row.insertCell(2);
+
+			cell1.textContent = interaction.src;
+			cell2.textContent = interaction.dst; // You may want to change this to the actual destination node
+			cell3.textContent = interaction.t;
+		});
+		// interaction = interactions[interactions.length - 1]
+
+		// const row = tableBody.insertRow(rowNewCell);
+		// const cell1 = row.insertCell(0);
+		// const cell2 = row.insertCell(1);
+		// const cell3 = row.insertCell(2);
+
+		// cell1.textContent = interaction.src;
+		// cell2.textContent = interaction.dst; // You may want to change this to the actual destination node
+		// cell3.textContent = interaction.t;
+	}
+
+
+	canvas = document.getElementById('gameCanvas');
+	ctx = canvas.getContext('2d');
+	// ctx.scale(scale, scale)
+	var yscale = 1.0;
+	var spaceBetweenNodes = 100;
+	var nodeSize = 10;
+	var yTimeAxis = canvas.height - 30;
+
+	function calculateNodeY() {
+		var maxId = Math.max(...nodes.map((node) => node.id));
+		potentialMaxY = maxId * spaceBetweenNodes;
+		if (potentialMaxY > canvas.height - 10) {
+			scaleFactor = (canvas.height - 10) / potentialMaxY;
+			yscale = yscale * scaleFactor;
+			nodeSize = nodeSize * scaleFactor;
+		}
+		nodes.forEach((node) => {
+			node.y = node.id * spaceBetweenNodes * yscale;
+		});
+	}
+
+	const addButton = document.getElementById('addNodeButton');
+	addButton.addEventListener('click', addNode);
+
+	const resetButton = document.getElementById('reset');
+
+	const exportCSVButton = document.getElementById('exportCSV');
+	function exportToCsv() {
+		var csvString = "Source Node,Destination Node,Timestamp\n";
+
+		sortedInteractions = interactions.sort((a, b) => a.t - b.t);
+		sortedInteractions.forEach((interaction) => {
+			csvString += `${interaction.src},${interaction.dst},${interaction.t}\n`;
+		});
+
+		var a = document.getElementById("exportCSV");
+		a.href = URL.createObjectURL(new Blob([csvString], {
+			type: "text/csv"
+		}));
+		a.setAttribute("download", "temporal_graph.csv");
+		document.body.appendChild(a);
+		a.click();
+	}
+	function updateTextArea() {
+		const csvTextArea = document.querySelector('#csvTextArea');
+		var csvString = "Source,Destination,Timestamp\n";
+
+		sortedInteractions = interactions.sort((a, b) => a.t - b.t);
+		sortedInteractions.forEach((interaction) => {
+			csvString += `${interaction.src},${interaction.dst},${interaction.t}\n`;
+		});
+		csvTextArea.value = csvString;
+	}
+	function copyToClipboard() {
+		const csvTextArea = document.querySelector('#csvTextArea');
+
+		// Select the text in the textarea
+		csvTextArea.select();
+		csvTextArea.setSelectionRange(0, 99999); // For mobile devices
+
+		// Copy the text to the clipboard
+		document.execCommand('copy');
+
+		// Deselect the text
+		csvTextArea.setSelectionRange(0, 0);
+	}
+	function reset() {
+		yscale = 1.0;
+		spaceBetweenNodes = 100;
+		nodeSize = 10;
+
+		nodes = [
+			{ id: 1, y: 100, color: 'red', },
+			{ id: 2, y: 200, color: 'blue' },
+		];
+		interactions = [
+			{ src: 1, dst: 2, t: 0, },
+			// Add more interactions as needed
+		];
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		window.onload();
+	}
+	resetButton.addEventListener('click', reset);
+
+
+	var hoveredNode = null;
+	var xOrigin = 100;
+	var tmin = 50;
+	var timeStepSize = 5;
+	// var tmin = 0;
+	var tmax = 500;
+
+	function addNode() {
+		var id = nodes.length + 1;
+		// Random color
+		var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+		nodes.push({ id, color });
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		drawGraph();
+		calculateNodeY();
+
+	}
+	function drawVerticalLine(x, y, height) {
+		ctx.beginPath();
+		ctx.moveTo(x, y);
+		ctx.lineTo(x, y + height);
+		ctx.stroke();
+	}
+	function drawVerticalDashedLine(x, y, height) {
+		ctx.beginPath();
+		ctx.setLineDash([5, 5]); // 5px dashes, 5px gaps
+		ctx.strokeStyle = 'black';
+		ctx.lineDashOffset = 0; // Reset the offset
+		ctx.moveTo(x, y);
+		ctx.lineTo(x, y + height);
+		ctx.stroke();
+		ctx.setLineDash([]);
+		ctx.strokeStyle = 'black'; // Set to default color
+	}
+	function drawHorizontalDashedLine(y, color) {
+		ctx.beginPath();
+		ctx.setLineDash([5, 5]); // 5px dashes, 5px gaps
+		ctx.strokeStyle = color;
+		ctx.lineDashOffset = 0; // Reset the offset
+		ctx.moveTo(tmin, y);
+		ctx.lineTo(tmax, y);
+		ctx.stroke();
+		ctx.setLineDash([]);
+		ctx.strokeStyle = 'black'; // Set to default color
+	}
+
+	function drawTemporalEvent(interaction) {
+		var srcNode = nodes.find((node) => node.id === interaction.src);
+		var dstNode = nodes.find((node) => node.id === interaction.dst);
+
+		var y1 = srcNode.y;
+		var y2 = dstNode.y;
+
+		var x = tmin + timeStepSize * interaction.t;
+
+		function drawNodeEvent(node) {
+			ctx.fillStyle = node.color;
+			ctx.beginPath();
+			ctx.arc(x, node.y, nodeSize, 0, Math.PI * 2, true);
+			ctx.fill();
+		}
+		// Draw a vertical line connecting the nodes at time t
+		ctx.beginPath();
+		ctx.moveTo(x, y1);
+		ctx.lineTo(x, y2);
+		ctx.stroke();
+		drawNodeEvent(srcNode);
+		drawNodeEvent(dstNode);
+	}
+
+	function drawGraph() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		// Draw nodes
+		nodes.forEach((node) => drawHorizontalDashedLine(node.y, node.color),);
+
+		// Draw a "+" at the origin
+		// ctx.font = "50px Arial";
+		// ctx.fillText("+", tmin + 10, xOrigin + 10);
+
+		// Draw temporal events
+		interactions.forEach((interaction) => drawTemporalEvent(interaction));
+
+		// Draw temporal axis
+		drawHorizontalDashedLine(yTimeAxis, 'black');
+		ctx.font = "20px Arial";
+		ctx.fillStyle = 'black';
+		ctx.fillText("Time", tmax + 10, yTimeAxis);
+
+		// Draw Node Labels
+		ctx.font = "20px Arial";
+		function drawNodeLabel(node) {
+			// 
+			ctx.fillStyle = node.color;
+			ctx.fillText(node.id, tmin - 40, node.y);
+		}
+		nodes.forEach((node) => drawNodeLabel(node));
+	}
+
+	function isMouseOverNode(mouseX, mouseY, node) {
+		return (
+			// mouseX >= node.x - 20 &&
+			// mouseX <= node.x + 20 &&
+			mouseY >= node.y - 20 &&
+			mouseY <= node.y + 20
+		);
+	}
+
+	var isSourceNodeClicked = false;
+	var sourceNode;
+	var isDestinationNodeClicked = false;
+	var destinationNode;
+
+	function drawCurvedLine(x1, y1, x2, y2) {
+		var radius = 45;
+		var angle = Math.atan2(y2 - y1, x2 - x1);
+		var controlX = x1 + radius * Math.cos(angle + Math.PI / 2);
+		var controlY = y1 + radius * Math.sin(angle + Math.PI / 2);
+		ctx.beginPath();
+		ctx.moveTo(x1, y1);
+		ctx.quadraticCurveTo(controlX, controlY, x2, y2);
+
+
+		ctx.strokeStyle = 'black';
+		ctx.lineWidth = 2;
+		ctx.setLineDash([5, 5]);
+		ctx.stroke();
+		ctx.setLineDash([]); // Reset line dash
+	}
+	canvas.addEventListener('mousemove', function (event) {
+		var rect = canvas.getBoundingClientRect();
+		var mouseX = event.clientX - rect.left;
+		var mouseY = event.clientY - rect.top;
+
+		// Check if the mouse is over any node
+		hoveredNode = nodes.find((node) => isMouseOverNode(mouseX, mouseY, node));
+		// Redraw the graph
+		drawGraph();
+
+		// display the id of the node around the mouse position
+		if (hoveredNode) {
+			// Display the node id
+			ctx.font = "20px Arial";
+			ctx.fillStyle = hoveredNode.color;
+			ctx.fillText(hoveredNode.id, mouseX + 10, mouseY - 10);
+			// Display the time
+			ctx.fillStyle = "black";
+			var t = Math.floor((mouseX - tmin) / timeStepSize);
+			ctx.fillText(t, mouseX + 10, yTimeAxis);
+			// Draw a vertical line
+			ctx.lineWidth = 0.5;
+			drawVerticalDashedLine(mouseX, xOrigin, yTimeAxis);
+			ctx.lineWidth = 1;
+		}
+
+		if (isSourceNodeClicked) {
+			// Draw a vertical line
+			console.log(sourceNode);
+			drawCurvedLine(mouseX, sourceNode.y, mouseX, mouseY);
+			// Draw a line connecting the source node to the mouse
+			// ctx.beginPath();
+			// ctx.moveTo(sourceNode.x, sourceNode.y);
+			// ctx.lineTo(mouseX, mouseY);
+			// ctx.stroke();
+		}
+	});
+
+	canvas.addEventListener("click", function (event) {
+		var rect = canvas.getBoundingClientRect();
+		var mouseX = event.clientX - rect.left;
+		var mouseY = event.clientY - rect.top;
+
+		// Check if the mouse is over any node
+		var clickedNode = nodes.find((node) => isMouseOverNode(mouseX, mouseY, node));
+
+		if (clickedNode) {
+			if (!isSourceNodeClicked) {
+				isSourceNodeClicked = true;
+				sourceNode = clickedNode;
+			} else if (!isDestinationNodeClicked) {
+				isDestinationNodeClicked = true;
+				destinationNode = clickedNode;
+			}
+		}
+
+		if (isSourceNodeClicked && isDestinationNodeClicked) {
+			// Add an interaction
+			var t = Math.floor((mouseX - tmin) / timeStepSize);
+			index = interactions.filter((it) => it.t < t).length;
+			interactions.push({ src: sourceNode.id, dst: destinationNode.id, t: t, index: index });
+
+			// Look at how many interaction times are smaller than t
+
+
+			// Reset the flags
+			isSourceNodeClicked = false;
+			isDestinationNodeClicked = false;
+			window.onload();
+		}
+	});
+
+
+
+	window.onload = function () {
+		// Draw the initial graph
+		drawGraph();
+		// updateTable();
+		updateTextArea();
+	};
+</script>
+
+</html>
