@@ -1,0 +1,250 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 800px;
+                 background-color: #f9f9f9;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 800px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "font": {"color": "black"}, "id": "Adana_Twins", "label": "Adana_Twins", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Upercent", "label": "Upercent", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "WhoMadeWho", "label": "WhoMadeWho", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Aera", "label": "Aera", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Skatman", "label": "Skatman", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tom_Peters", "label": "Tom_Peters", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Alican", "label": "Alican", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "EdOne", "label": "EdOne", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tal_Fussman", "label": "Tal_Fussman", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Alec_Falconer", "label": "Alec_Falconer", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Harry_Wills", "label": "Harry_Wills", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Alex_Neri", "label": "Alex_Neri", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Reiss", "label": "Reiss", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Hamish_\u0026_Toby", "label": "Hamish_\u0026_Toby", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Alex_Picone", "label": "Alex_Picone", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Juju_\u0026_Jordash", "label": "Juju_\u0026_Jordash", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Murat_Uncuoglu", "label": "Murat_Uncuoglu", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Echonomist", "label": "Echonomist", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Ana\u00efs_Liro", "label": "Ana\u00efs_Liro", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Josh_Tweek", "label": "Josh_Tweek", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "LEGRAM_VG", "label": "LEGRAM_VG", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Oscar_VG", "label": "Oscar_VG", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Andy_Hart", "label": "Andy_Hart", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Bruno_Schmidt", "label": "Bruno_Schmidt", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dan_\u0026_The_Mackerel", "label": "Dan_\u0026_The_Mackerel", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Gros-C\u00e2lin", "label": "Gros-C\u00e2lin", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Indi_Zone", "label": "Indi_Zone", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lucy_Cook", "label": "Lucy_Cook", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Mculo", "label": "Mculo", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Pablo_Tarno", "label": "Pablo_Tarno", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Pluralized", "label": "Pluralized", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tommy_BunZ", "label": "Tommy_BunZ", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Andrea_Ferlin", "label": "Andrea_Ferlin", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lenny_Mailleau", "label": "Lenny_Mailleau", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Jonas_Blanquiere", "label": "Jonas_Blanquiere", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Ma.to", "label": "Ma.to", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Andrew_James_Gustav", "label": "Andrew_James_Gustav", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "James_Andrew", "label": "James_Andrew", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Anthea", "label": "Anthea", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "tINI", "label": "tINI", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dr_Banana", "label": "Dr_Banana", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Atjazz", "label": "Atjazz", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dave_Aju", "label": "Dave_Aju", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Delano_Smith", "label": "Delano_Smith", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Point_G", "label": "Point_G", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Moodymann", "label": "Moodymann", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "T_Jacques", "label": "T_Jacques", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "BOg", "label": "BOg", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "SKALA", "label": "SKALA", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Beesmunt_Soundsystem", "label": "Beesmunt_Soundsystem", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "O.BEE", "label": "O.BEE", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Bicep", "label": "Bicep", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Binh", "label": "Binh", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DJ_Masda", "label": "DJ_Masda", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Eli_Verveine", "label": "Eli_Verveine", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "BioN", "label": "BioN", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Kosh", "label": "Kosh", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Boddhi_Satva", "label": "Boddhi_Satva", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Ian_Pooley", "label": "Ian_Pooley", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Underworld", "label": "Underworld", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Earth_Trax", "label": "Earth_Trax", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Rick_Wade", "label": "Rick_Wade", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DJ_Seinfeld", "label": "DJ_Seinfeld", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "New_Jackson", "label": "New_Jackson", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Brawther", "label": "Brawther", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Prins_Thomas", "label": "Prins_Thomas", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Gerd_Janson", "label": "Gerd_Janson", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Butch", "label": "Butch", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Inner", "label": "Inner", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Musumeci", "label": "Musumeci", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Frank_Wiedemann", "label": "Frank_Wiedemann", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "GoldFFinch", "label": "GoldFFinch", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Trikk", "label": "Trikk", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Yost_Koen", "label": "Yost_Koen", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "\u00c2me", "label": "\u00c2me", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dodi_Palese", "label": "Dodi_Palese", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Phunkadelica", "label": "Phunkadelica", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Byron_The_Aquarius", "label": "Byron_The_Aquarius", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Samo_DJ", "label": "Samo_DJ", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "C.K", "label": "C.K", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "C.P.I.", "label": "C.P.I.", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Davis", "label": "Davis", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Z@p", "label": "Z@p", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Chris_Di_Perri", "label": "Chris_Di_Perri", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dixon", "label": "Dixon", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Henrik_Schwarz", "label": "Henrik_Schwarz", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Quest", "label": "Quest", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Ede", "label": "Ede", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Capablanca", "label": "Capablanca", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Marc_Pi\u00f1ol", "label": "Marc_Pi\u00f1ol", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Cecilio", "label": "Cecilio", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Laurine", "label": "Laurine", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Slow_Life", "label": "Slow_Life", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Central", "label": "Central", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Fort_Romeau", "label": "Fort_Romeau", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Jesse_Bru", "label": "Jesse_Bru", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Pional", "label": "Pional", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Chlo\u00e9_Caillet", "label": "Chlo\u00e9_Caillet", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Solomun", "label": "Solomun", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tale_Of_Us", "label": "Tale_Of_Us", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "E.LINA", "label": "E.LINA", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Eva_Geist", "label": "Eva_Geist", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Cinthie", "label": "Cinthie", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Frits_Wentink", "label": "Frits_Wentink", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tommy_Vicari_Jnr", "label": "Tommy_Vicari_Jnr", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Core", "label": "Core", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dino_Lenny", "label": "Dino_Lenny", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Kevin_Di_Serna", "label": "Kevin_Di_Serna", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lizz", "label": "Lizz", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Mano_Le_Tough", "label": "Mano_Le_Tough", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "or:la", "label": "or:la", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Crihan", "label": "Crihan", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Nu_Zau", "label": "Nu_Zau", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Sepp", "label": "Sepp", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DJ_Aakmael", "label": "DJ_Aakmael", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Kresy", "label": "Kresy", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Larry_Heard", "label": "Larry_Heard", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Jack_D", "label": "Jack_D", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dan_Shake", "label": "Dan_Shake", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Eli_Escobar", "label": "Eli_Escobar", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lauer", "label": "Lauer", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "David_August", "label": "David_August", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Switchdance", "label": "Switchdance", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "David_Kochs", "label": "David_Kochs", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dominik_Marz", "label": "Dominik_Marz", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Denis_Horvat", "label": "Denis_Horvat", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Glowal", "label": "Glowal", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Diego_Krause", "label": "Diego_Krause", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Nick_Beringer", "label": "Nick_Beringer", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "East_End_Dubs", "label": "East_End_Dubs", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Ditian", "label": "Ditian", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Floyd_Lavine", "label": "Floyd_Lavine", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Djebali", "label": "Djebali", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Jorge_Savoretti", "label": "Jorge_Savoretti", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Dyed_Soundorom", "label": "Dyed_Soundorom", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Gene_On_Earth", "label": "Gene_On_Earth", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Shonky", "label": "Shonky", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Edward", "label": "Edward", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Kingpin_Cartel", "label": "Kingpin_Cartel", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Neil-E", "label": "Neil-E", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Flabaire", "label": "Flabaire", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Marcel_Dettmann", "label": "Marcel_Dettmann", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Francesco_Chiocci", "label": "Francesco_Chiocci", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Nandu", "label": "Nandu", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Frankey_\u0026_Sandrino", "label": "Frankey_\u0026_Sandrino", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Jimi_Jules", "label": "Jimi_Jules", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Fumiya_Tanaka", "label": "Fumiya_Tanaka", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Thomas_Melchior", "label": "Thomas_Melchior", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tuff_City_Kids", "label": "Tuff_City_Kids", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "S3A", "label": "S3A", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Imp\u00e9rieux", "label": "Imp\u00e9rieux", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Stefan_Goldmann", "label": "Stefan_Goldmann", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "International_Mac", "label": "International_Mac", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tau_Car", "label": "Tau_Car", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Jay_Daniel", "label": "Jay_Daniel", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Kyle_Hall", "label": "Kyle_Hall", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "John_Dimas", "label": "John_Dimas", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Voigtmann", "label": "Voigtmann", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "John_Talabot", "label": "John_Talabot", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lamusa_II", "label": "Lamusa_II", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Roman_Fl\u00fcgel", "label": "Roman_Fl\u00fcgel", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lion\u0027s_Drums", "label": "Lion\u0027s_Drums", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Kyle_Toole", "label": "Kyle_Toole", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Tomas_Station", "label": "Tomas_Station", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Laurent_Garnier", "label": "Laurent_Garnier", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "The_Machine", "label": "The_Machine", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "The_Ghost", "label": "The_Ghost", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lay-Far", "label": "Lay-Far", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Osunlade", "label": "Osunlade", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lee_Burridge", "label": "Lee_Burridge", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Rhadoo", "label": "Rhadoo", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Petre_Inspirescu", "label": "Petre_Inspirescu", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Lorenzo_Chiabotti", "label": "Lorenzo_Chiabotti", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Luc_Ringeisen", "label": "Luc_Ringeisen", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Makcim", "label": "Makcim", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Ricardo_Villalobos", "label": "Ricardo_Villalobos", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Marcellus_Pittman", "label": "Marcellus_Pittman", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Round", "label": "Round", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Matteo_Manzini", "label": "Matteo_Manzini", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Timoti", "label": "Timoti", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Sammy_Dee", "label": "Sammy_Dee", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Zip", "label": "Zip", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Session_Victim", "label": "Session_Victim", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Trent", "label": "Trent", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "Sibil", "label": "Sibil", "shape": "dot", "size": 10}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "XDB", "label": "XDB", "shape": "dot", "size": 10}]);
+                  edges = new vis.DataSet([{"from": "Adana_Twins", "to": "Upercent", "width": 0.21434389785274247}, {"from": "Adana_Twins", "to": "WhoMadeWho", "width": 0.1388405522940814}, {"from": "Aera", "to": "Skatman", "width": 0.5129840145009367}, {"from": "Aera", "to": "Tom_Peters", "width": 0.36356646676760507}, {"from": "Skatman", "to": "Tom_Peters", "width": 0.41661888440426803}, {"from": "Tom_Peters", "to": "Alican", "width": 0.6196721846984103}, {"from": "Tom_Peters", "to": "EdOne", "width": 0.7700364385540657}, {"from": "Tom_Peters", "to": "Tal_Fussman", "width": 0.7259125385473353}, {"from": "Alec_Falconer", "to": "Harry_Wills", "width": 0.15879768911344366}, {"from": "Alex_Neri", "to": "Reiss", "width": 0.1118780090927528}, {"from": "Reiss", "to": "Hamish_\u0026_Toby", "width": 0.28119291370267596}, {"from": "Alex_Picone", "to": "Juju_\u0026_Jordash", "width": 0.11694106924093724}, {"from": "Alican", "to": "EdOne", "width": 0.690278855667323}, {"from": "Alican", "to": "Murat_Uncuoglu", "width": 0.16278249856658064}, {"from": "Alican", "to": "Tal_Fussman", "width": 0.6561582785901073}, {"from": "EdOne", "to": "Tal_Fussman", "width": 0.8144006663517968}, {"from": "Tal_Fussman", "to": "Echonomist", "width": 0.1235851647660185}, {"from": "Ana\u00efs_Liro", "to": "Josh_Tweek", "width": 0.49026246833745385}, {"from": "Ana\u00efs_Liro", "to": "LEGRAM_VG", "width": 0.8926196569376834}, {"from": "Ana\u00efs_Liro", "to": "Oscar_VG", "width": 0.9131280397082372}, {"from": "Josh_Tweek", "to": "Andy_Hart", "width": 0.20569064667683123}, {"from": "Josh_Tweek", "to": "Bruno_Schmidt", "width": 0.13252548135547557}, {"from": "Josh_Tweek", "to": "Dan_\u0026_The_Mackerel", "width": 0.23841403169174236}, {"from": "Josh_Tweek", "to": "Gros-C\u00e2lin", "width": 0.12089797996275331}, {"from": "Josh_Tweek", "to": "Indi_Zone", "width": 0.10885262067854776}, {"from": "Josh_Tweek", "to": "LEGRAM_VG", "width": 0.4376179162967999}, {"from": "Josh_Tweek", "to": "Lucy_Cook", "width": 0.1256901464949985}, {"from": "Josh_Tweek", "to": "Mculo", "width": 0.1942043504591342}, {"from": "Josh_Tweek", "to": "Oscar_VG", "width": 0.4476724066555009}, {"from": "Josh_Tweek", "to": "Pablo_Tarno", "width": 0.16647337290988587}, {"from": "Josh_Tweek", "to": "Pluralized", "width": 0.15361776787386977}, {"from": "Josh_Tweek", "to": "Tommy_BunZ", "width": 0.22796741723578173}, {"from": "LEGRAM_VG", "to": "Oscar_VG", "width": 0.8756560133079924}, {"from": "Andrea_Ferlin", "to": "Lenny_Mailleau", "width": 0.7326699920401686}, {"from": "Lenny_Mailleau", "to": "Jonas_Blanquiere", "width": 0.5230947745804393}, {"from": "Lenny_Mailleau", "to": "Ma.to", "width": 0.1640556112810213}, {"from": "Andrew_James_Gustav", "to": "James_Andrew", "width": 0.9266276185477618}, {"from": "Anthea", "to": "tINI", "width": 0.14490471120044368}, {"from": "tINI", "to": "Dr_Banana", "width": 0.23314641384231988}, {"from": "Atjazz", "to": "Dave_Aju", "width": 0.1589450145358108}, {"from": "Atjazz", "to": "Delano_Smith", "width": 0.6383263782626306}, {"from": "Atjazz", "to": "Point_G", "width": 0.3611229275504755}, {"from": "Dave_Aju", "to": "Moodymann", "width": 0.3049686852535186}, {"from": "Dave_Aju", "to": "T_Jacques", "width": 0.36627379248650155}, {"from": "Delano_Smith", "to": "Point_G", "width": 0.41762337303534514}, {"from": "BOg", "to": "SKALA", "width": 0.15538211112122435}, {"from": "Beesmunt_Soundsystem", "to": "O.BEE", "width": 0.18159205980251675}, {"from": "O.BEE", "to": "Bicep", "width": 0.1789299115156008}, {"from": "Binh", "to": "DJ_Masda", "width": 0.309408552423167}, {"from": "DJ_Masda", "to": "Eli_Verveine", "width": 0.15129633991415917}, {"from": "BioN", "to": "Kosh", "width": 0.10158672700632099}, {"from": "Boddhi_Satva", "to": "Ian_Pooley", "width": 0.31871704780760696}, {"from": "Boddhi_Satva", "to": "Underworld", "width": 0.476770873030568}, {"from": "Ian_Pooley", "to": "Earth_Trax", "width": 0.1001848864840994}, {"from": "Ian_Pooley", "to": "Rick_Wade", "width": 0.11637982063202076}, {"from": "Ian_Pooley", "to": "Underworld", "width": 0.17651338980091075}, {"from": "Underworld", "to": "DJ_Seinfeld", "width": 0.23327337474207324}, {"from": "Underworld", "to": "New_Jackson", "width": 0.47553196871118103}, {"from": "Brawther", "to": "Prins_Thomas", "width": 0.11050954420312258}, {"from": "Prins_Thomas", "to": "Gerd_Janson", "width": 0.2808340081188791}, {"from": "Butch", "to": "Inner", "width": 0.13257329227642303}, {"from": "Butch", "to": "Musumeci", "width": 0.18824285017310527}, {"from": "Inner", "to": "Frank_Wiedemann", "width": 0.1982981378479481}, {"from": "Inner", "to": "GoldFFinch", "width": 0.22112158146574407}, {"from": "Inner", "to": "Musumeci", "width": 0.10908732868487313}, {"from": "Inner", "to": "Trikk", "width": 0.18215566672512665}, {"from": "Inner", "to": "Yost_Koen", "width": 0.13001686265538434}, {"from": "Inner", "to": "\u00c2me", "width": 0.16073947577468248}, {"from": "Musumeci", "to": "Dodi_Palese", "width": 0.32262808101470813}, {"from": "Musumeci", "to": "Phunkadelica", "width": 0.4667968392091921}, {"from": "Byron_The_Aquarius", "to": "Samo_DJ", "width": 0.21262490473976017}, {"from": "C.K", "to": "C.P.I.", "width": 0.10070583774647009}, {"from": "C.K", "to": "Davis", "width": 0.24435712499943732}, {"from": "C.K", "to": "Z@p", "width": 0.21554533891146846}, {"from": "C.K", "to": "\u00c2me", "width": 0.13113896513534076}, {"from": "C.P.I.", "to": "Chris_Di_Perri", "width": 0.2899496446974491}, {"from": "C.P.I.", "to": "Z@p", "width": 0.12943095395177853}, {"from": "\u00c2me", "to": "Dixon", "width": 0.25222169955531}, {"from": "\u00c2me", "to": "Frank_Wiedemann", "width": 0.19445549498153844}, {"from": "\u00c2me", "to": "Henrik_Schwarz", "width": 0.3221695363901078}, {"from": "\u00c2me", "to": "Quest", "width": 0.11801576591977767}, {"from": "Chris_Di_Perri", "to": "Ede", "width": 0.29182077127888073}, {"from": "Capablanca", "to": "Marc_Pi\u00f1ol", "width": 0.6806003109144039}, {"from": "Cecilio", "to": "Laurine", "width": 0.6944126613200122}, {"from": "Cecilio", "to": "Slow_Life", "width": 0.1891605615172772}, {"from": "Laurine", "to": "Slow_Life", "width": 0.4808127170464879}, {"from": "Central", "to": "Fort_Romeau", "width": 0.13114134177556108}, {"from": "Fort_Romeau", "to": "Jesse_Bru", "width": 0.13215006222856995}, {"from": "Fort_Romeau", "to": "Pional", "width": 0.444885337645403}, {"from": "Chlo\u00e9_Caillet", "to": "Solomun", "width": 0.11654442734923638}, {"from": "Solomun", "to": "Tale_Of_Us", "width": 0.13278238257364836}, {"from": "Ede", "to": "E.LINA", "width": 0.1974070004683845}, {"from": "Ede", "to": "Eva_Geist", "width": 0.29987142116161003}, {"from": "Cinthie", "to": "Frits_Wentink", "width": 0.30001114806488555}, {"from": "Cinthie", "to": "Tommy_Vicari_Jnr", "width": 0.2207789298643526}, {"from": "Core", "to": "Dino_Lenny", "width": 0.4569428930169848}, {"from": "Core", "to": "Kevin_Di_Serna", "width": 0.16579058036774394}, {"from": "Core", "to": "Lizz", "width": 0.1681786177249123}, {"from": "Core", "to": "Mano_Le_Tough", "width": 0.11004363405916007}, {"from": "Dino_Lenny", "to": "Mano_Le_Tough", "width": 0.18327153398396606}, {"from": "Lizz", "to": "Ma.to", "width": 0.1976583424808749}, {"from": "Lizz", "to": "or:la", "width": 0.24097396604071958}, {"from": "Crihan", "to": "Nu_Zau", "width": 0.304016755162884}, {"from": "Nu_Zau", "to": "Sepp", "width": 0.315876986356996}, {"from": "DJ_Aakmael", "to": "Kresy", "width": 0.7130435747580847}, {"from": "DJ_Aakmael", "to": "Larry_Heard", "width": 0.33673278652522837}, {"from": "Kresy", "to": "Larry_Heard", "width": 0.41765982987935474}, {"from": "Larry_Heard", "to": "Jack_D", "width": 0.1776366055176136}, {"from": "DJ_Seinfeld", "to": "New_Jackson", "width": 0.4905524551257964}, {"from": "Dan_Shake", "to": "Jesse_Bru", "width": 0.15373557677238806}, {"from": "Moodymann", "to": "Earth_Trax", "width": 0.14946500356961276}, {"from": "Moodymann", "to": "T_Jacques", "width": 0.22402464074673167}, {"from": "T_Jacques", "to": "Eli_Escobar", "width": 0.11669797078884199}, {"from": "T_Jacques", "to": "Gerd_Janson", "width": 0.12482999156168006}, {"from": "T_Jacques", "to": "Lauer", "width": 0.15112234714180106}, {"from": "David_August", "to": "Switchdance", "width": 0.1371735130471778}, {"from": "David_Kochs", "to": "Dominik_Marz", "width": 0.3043543641010729}, {"from": "Denis_Horvat", "to": "Glowal", "width": 0.3552064095240669}, {"from": "Diego_Krause", "to": "Nick_Beringer", "width": 0.600266706651376}, {"from": "Nick_Beringer", "to": "East_End_Dubs", "width": 0.15493897135968954}, {"from": "Ditian", "to": "Floyd_Lavine", "width": 0.2461903393795651}, {"from": "Dixon", "to": "Henrik_Schwarz", "width": 0.2858787310160799}, {"from": "Djebali", "to": "Jorge_Savoretti", "width": 0.3610122534540987}, {"from": "Dyed_Soundorom", "to": "Gene_On_Earth", "width": 0.14773127892422913}, {"from": "Dyed_Soundorom", "to": "Shonky", "width": 0.2941797274685793}, {"from": "Edward", "to": "Kingpin_Cartel", "width": 0.17233216725286554}, {"from": "Edward", "to": "Neil-E", "width": 0.12469517989917973}, {"from": "Flabaire", "to": "Marcel_Dettmann", "width": 0.11786992473263501}, {"from": "Francesco_Chiocci", "to": "Nandu", "width": 0.12330382230546201}, {"from": "Frankey_\u0026_Sandrino", "to": "Trikk", "width": 0.11059247831993924}, {"from": "Trikk", "to": "Jimi_Jules", "width": 0.2208721619310175}, {"from": "Fumiya_Tanaka", "to": "Thomas_Melchior", "width": 0.23410351301177607}, {"from": "Gerd_Janson", "to": "Lauer", "width": 0.14330877902718392}, {"from": "Lauer", "to": "Tuff_City_Kids", "width": 0.17229954143207332}, {"from": "Rick_Wade", "to": "S3A", "width": 0.2137832056199593}, {"from": "Imp\u00e9rieux", "to": "Stefan_Goldmann", "width": 0.6098128995549806}, {"from": "International_Mac", "to": "Tau_Car", "width": 0.20718159169746822}, {"from": "Jay_Daniel", "to": "Kyle_Hall", "width": 0.7441495887000037}, {"from": "Kyle_Hall", "to": "Tuff_City_Kids", "width": 0.16976187042112809}, {"from": "John_Dimas", "to": "Voigtmann", "width": 0.193012161744489}, {"from": "John_Talabot", "to": "Lamusa_II", "width": 0.1620044532541013}, {"from": "John_Talabot", "to": "Roman_Fl\u00fcgel", "width": 0.1914491659905138}, {"from": "Roman_Fl\u00fcgel", "to": "Lion\u0027s_Drums", "width": 0.14786439966202175}, {"from": "Jonas_Blanquiere", "to": "Ma.to", "width": 0.31362502409359}, {"from": "Kyle_Toole", "to": "Tomas_Station", "width": 0.5004035506911448}, {"from": "Laurent_Garnier", "to": "The_Machine", "width": 0.15032043294858333}, {"from": "The_Machine", "to": "The_Ghost", "width": 0.4018139837243511}, {"from": "Lay-Far", "to": "Osunlade", "width": 0.17998359987477597}, {"from": "Lee_Burridge", "to": "Rhadoo", "width": 0.32666782038317815}, {"from": "Rhadoo", "to": "Petre_Inspirescu", "width": 0.40559679309403407}, {"from": "Lorenzo_Chiabotti", "to": "Luc_Ringeisen", "width": 0.18822644947541617}, {"from": "Makcim", "to": "Ricardo_Villalobos", "width": 0.2982566934952574}, {"from": "Marcellus_Pittman", "to": "Round", "width": 0.4703525163879662}, {"from": "Matteo_Manzini", "to": "Timoti", "width": 0.48586579810734964}, {"from": "Sammy_Dee", "to": "Zip", "width": 0.5587070955097337}, {"from": "Session_Victim", "to": "Trent", "width": 0.15746958394787225}, {"from": "Sibil", "to": "XDB", "width": 0.4221090705907188}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
