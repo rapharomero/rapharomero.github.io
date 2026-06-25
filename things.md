@@ -6,8 +6,6 @@ title: Two Blind Spots in the Climate Debate: The Limits of Regulation and the S
 
 # Two Blind Spots in the Climate Debate: The Limits of Regulation and the Sunk Cost Trap
 
----
-
 ## Problem 1: "Just Regulate More" — Can Governments Actually Do What Climate Activists Demand?
 
 ### Formulating the Problem
