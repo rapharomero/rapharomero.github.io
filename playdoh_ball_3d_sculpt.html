@@ -1,0 +1,194 @@
+<div style="display:flex; flex-direction:column; align-items:center; padding:1rem 0; user-select:none;">
+  <div id="stage" style="width:100%; max-width:420px; height:380px; position:relative;">
+    <div id="loading" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--text-muted);">loading…</div>
+  </div>
+  <div style="display:flex; gap:1.5rem; margin-top:0.75rem; font-size:13px; color:var(--text-muted);">
+    <span><b>Left-drag</b> sculpt</span>
+    <span><b>Right-drag</b> orbit camera</span>
+    <span><b>Scroll</b> zoom</span>
+  </div>
+  <div style="display:flex; gap:10px; align-items:center; margin-top:0.75rem; font-size:13px; color:var(--text-muted);">
+    <label>melt speed</label>
+    <input id="melt" type="range" min="1" max="60" value="8" style="width:130px;">
+    <label style="margin-left:10px;">brush</label>
+    <input id="brush" type="range" min="15" max="90" value="45" style="width:100px;">
+  </div>
+</div>
+<script>
+(function(){
+  function load(src){
+    return new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  load('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js').then(init).catch(() => {
+    document.getElementById('loading').textContent = 'could not load 3D library';
+  });
+
+  function init(){
+    const stage = document.getElementById('stage');
+    document.getElementById('loading').remove();
+
+    const W = stage.clientWidth, H = stage.clientHeight;
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, W/H, 0.1, 100);
+    let camRadius = 4.2, camTheta = 0.6, camPhi = 1.25;
+    function updateCam(){
+      camera.position.set(
+        camRadius * Math.sin(camPhi) * Math.sin(camTheta),
+        camRadius * Math.cos(camPhi),
+        camRadius * Math.sin(camPhi) * Math.cos(camTheta)
+      );
+      camera.lookAt(0,0,0);
+    }
+    updateCam();
+
+    const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+    renderer.domElement.style.cursor = 'grab';
+    renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 0.85);
+    key.position.set(3, 5, 4); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xbfd4ff, 0.45);
+    rim.position.set(-4, -1, -3); scene.add(rim);
+
+    // ---- the dough ----
+    const R = 1.2;
+    const geo = new THREE.IcosahedronGeometry(R, 5); // ~10k verts, smooth enough to look like clay
+    geo.deleteAttribute('normal');
+    geo.deleteAttribute('uv');
+    const posAttr = geo.attributes.position;
+    const count = posAttr.count;
+    const rest = new Float32Array(posAttr.array); // shape memory: the original sphere
+
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xE8825A, roughness: 0.72, metalness: 0.0
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    geo.computeVertexNormals();
+
+    // ---- interaction ----
+    const raycaster = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    let mode = null;            // 'sculpt' | 'orbit'
+    let last = {x:0, y:0};
+    let grab = new THREE.Vector3();
+    let brushR = 0.45, meltRate = 0.008;
+
+    document.getElementById('melt').addEventListener('input', e => {
+      meltRate = 0.0012 * Number(e.target.value);
+    });
+    document.getElementById('brush').addEventListener('input', e => {
+      brushR = Number(e.target.value) / 100;
+    });
+
+    function toNDC(e){
+      const r = renderer.domElement.getBoundingClientRect();
+      ndc.x = ((e.clientX - r.left)/r.width)*2 - 1;
+      ndc.y = -((e.clientY - r.top)/r.height)*2 + 1;
+    }
+
+    renderer.domElement.addEventListener('pointerdown', e => {
+      renderer.domElement.setPointerCapture(e.pointerId);
+      last = {x:e.clientX, y:e.clientY};
+      if (e.button === 2){
+        mode = 'orbit';
+        renderer.domElement.style.cursor = 'move';
+      } else {
+        toNDC(e);
+        raycaster.setFromCamera(ndc, camera);
+        const hits = raycaster.intersectObject(mesh);
+        if (hits.length){
+          grab.copy(hits[0].point);
+          mode = 'sculpt';
+          renderer.domElement.style.cursor = 'grabbing';
+        }
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      mode = null;
+      renderer.domElement.style.cursor = 'grab';
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (!mode) return;
+      const dx = e.clientX - last.x, dy = e.clientY - last.y;
+      last = {x:e.clientX, y:e.clientY};
+
+      if (mode === 'orbit'){
+        camTheta -= dx * 0.008;
+        camPhi = Math.max(0.15, Math.min(Math.PI - 0.15, camPhi - dy * 0.008));
+        updateCam();
+        return;
+      }
+
+      // deformation axes come straight from the current view:
+      // screen-right and screen-up of the camera, in world space
+      const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+      const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+      const scale = 0.0055 * camRadius;
+      const move = new THREE.Vector3()
+        .addScaledVector(right, dx * scale)
+        .addScaledVector(up, -dy * scale);
+
+      const arr = posAttr.array;
+      const br2 = brushR * brushR;
+      for (let i = 0; i < count; i++){
+        const ix = i*3;
+        const ddx = arr[ix] - grab.x, ddy = arr[ix+1] - grab.y, ddz = arr[ix+2] - grab.z;
+        const d2 = ddx*ddx + ddy*ddy + ddz*ddz;
+        if (d2 < br2){
+          // smooth falloff so it pushes like clay, not like a spike
+          const w = 1 - d2/br2;
+          const f = w*w;
+          arr[ix]   += move.x * f;
+          arr[ix+1] += move.y * f;
+          arr[ix+2] += move.z * f;
+        }
+      }
+      grab.add(move); // brush follows the dough
+      posAttr.needsUpdate = true;
+    });
+
+    renderer.domElement.addEventListener('wheel', e => {
+      e.preventDefault();
+      camRadius = Math.max(2.2, Math.min(8, camRadius + e.deltaY * 0.002));
+      updateCam();
+    }, {passive:false});
+
+    // ---- slow melt back to a ball ----
+    function relax(){
+      const arr = posAttr.array;
+      const k = meltRate;
+      let moved = false;
+      for (let i = 0; i < count*3; i++){
+        const d = rest[i] - arr[i];
+        if (d > 0.00005 || d < -0.00005){
+          arr[i] += d * k;
+          moved = true;
+        }
+      }
+      if (moved) posAttr.needsUpdate = true;
+    }
+
+    function animate(){
+      if (mode !== 'sculpt') relax();
+      if (posAttr.needsUpdate || true) geo.computeVertexNormals();
+      mesh.rotation.y += 0.0012; // barely-there idle turn
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    animate();
+  }
+})();
+</script>
