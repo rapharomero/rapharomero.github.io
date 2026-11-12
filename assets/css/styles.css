@@ -1,0 +1,36 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #212529;
+  background: #fff;
+  padding-bottom: 4rem;
+}
+
+.profile {
+  width: 200px;
+  border-radius: 6px;
+}
+
+h1.display-6 {
+  margin-bottom: 0.75rem;
+}
+
+.publications li {
+  margin-bottom: 1.1rem;
+}
+
+.publications li p {
+  margin-bottom: 0.15rem;
+}
+
+.publication-authors {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+a.link-dark {
+  text-decoration-color: rgba(33, 37, 41, 0.35);
+}
+
+a.link-dark:hover {
+  text-decoration-color: rgba(33, 37, 41, 1);
+}

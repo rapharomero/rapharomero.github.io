@@ -1,149 +1,104 @@
 <!DOCTYPE html>
-<html>
-  <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>🧮 Home</title>
-  <meta name="description" content="">
-
-  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
-  
-    <link href="//fonts.googleapis.com/css?family=Lato:400,400italic" rel="stylesheet" type="text/css">
-  
-  
-  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
-  
-
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
-  <script>
-    let options = {
-      delimiters: [
-        { left: "$", right: "$", display: false },
-        { left: "$$", right: "$$", display: true },
-        { left: "\\(", right: "\\)", display: false },
-        { left: "\\[", right: "\\]", display: true }
-      ]
-    }
-    document.addEventListener("DOMContentLoaded", function () {
-      renderMathInElement(document.body, options);
-    });
-
-</script>
-
-  
-
-
-  <link rel="stylesheet" type="text/css" href="/css/tufte.css">
-  <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
-
-  <link rel="canonical" href="/">
-
-  <link rel="alternate" type="application/rss+xml" title="Raphaël's research website" href="/feed.xml">
+  <title>Raphaël Romero</title>
+  <meta name="description" content="Raphaël Romero, postdoctoral researcher in machine learning at Ghent University.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4 mt-5">
+        <img src="imgs/profile.jpg" alt="Photo of Raphaël Romero" class="profile d-block mb-3">
+        <h1 class="display-6">Raphaël Romero</h1>
+        <p class="lead">Postdoctoral Researcher in Machine Learning<br>
+          <a href="https://geoaiugent.wordpress.com/" class="link-dark">GeoAI Research Group</a><br>
+          <a href="https://geoweb.ugent.be/gi-science-and-technology" class="link-dark">GIS&amp;T team</a><br>
+          <a href="https://www.ugent.be/" class="link-dark">Ghent University</a></p>
+        <address>
+          <a href="mailto:raphael-romero@outlook.com" class="link-dark">raphael-romero@outlook.com</a>
+        </address>
+        <p>
+          <a href="https://scholar.google.com/citations?user=R9bXarYAAAAJ" class="link-dark">Google Scholar</a><br>
+          <a href="https://github.com/rapharomero" class="link-dark">GitHub</a><br>
+          <a href="assets/cv_Raphael_Romero.pdf" class="link-dark">CV (PDF)</a>
+        </p>
+      </div>
 
-  <body>
-    <!--- Header and nav template site-wide -->
-<header>
-    <nav class="group">
-	<!-- <a href="/"><img class="badge" src="/assets/img/badge_1.png" alt="CH"></a> -->
-	
-		
-  	
-		
-		    
-		      <a class="active" href="/">Home</a>
-		    
-	    
-  	
-		
-		    
-		      <a href="/posts">Posts</a>
-		    
-	    
-  	
-		
-		    
-		      <a href="/css/print.css"></a>
-		    
-	    
-  	
-		
-  	
-	</nav>
-</header>
-    <article class="group">
-      <h1>Home</h1>
-<p class="subtitle"></p>
+      <div class="col-lg-8 mt-5">
+        <h3>Research</h3>
+        <p>
+          I am a postdoctoral researcher in the <a href="https://geoaiugent.wordpress.com/" class="link-dark">GeoAI Research Group</a>, part of the <a href="https://geoweb.ugent.be/gi-science-and-technology" class="link-dark">GIS&amp;T team</a> at <a href="https://www.ugent.be/" class="link-dark">Ghent University</a>, where I work with Nico Van de Weghe on the <a href="https://www.imec-int.com/en/research-portfolio/streams" class="link-dark">STREAMS project</a> (Safe Traffic and Road Evaluation, Analysis and Monitoring System). The project aims to improve traffic safety around road works, in particular for vulnerable road users such as cyclists and pedestrians. I develop machine learning methods for the spatio-temporal data collected by its roadside sensors.
+        </p>
+        <p>
+          From 2024 to 2026 I was a postdoctoral researcher in the <a href="https://aida.ugent.be/" class="link-dark">AIDA group</a> at Ghent University, working with <a href="https://ai.ugent.be/people/TijlDeBie.en.html" class="link-dark">Tijl De Bie</a> and <a href="https://scholar.google.com/citations?user=cBSEeSMAAAAJ&amp;hl=en" class="link-dark">Jefrey Lijffijt</a>. My research there was on machine learning for temporal and graph-structured data: representation learning for temporal networks, point processes and event data, link prediction and its evaluation, and multiresolution analysis of dynamic networks.
+        </p>
+        <p>
+          I have applied these methods to several domains in collaboration with domain experts, including the movement of birds (with Lucy Mitchell, Luc Lens and Frederic Verbruggen at Ghent University), event prediction in soccer (with Jesse Davis and Maaike Van Roy at KU Leuven), career trajectories on the job market, music playlists, and the political positions expressed by large language models.
+        </p>
+        <p>
+          I completed my PhD at Ghent University in 2024, with the thesis "Modeling weighted and temporal graphs: methods and evaluation", supervised by Jefrey Lijffijt and Tijl De Bie. In the summer of 2024 I visited Imperial College London to work with <a href="https://www.ma.imperial.ac.uk/~naheard/" class="link-dark">Nick Heard</a> and <a href="https://amodell.me/" class="link-dark">Alexander Modell</a>, as part of the <a href="https://nest-programme.ac.uk/" class="link-dark">NeST programme</a> (Network Stochastic Processes and Time Series). 
+        </p>
 
-<p><label for="me" class="margin-toggle">⊕</label><input type="checkbox" id="me" class="margin-toggle"><span class="marginnote"><img class="fullwidth" src="/assets/img/pic0.jpg"><br></span></p>
-
-<p>Welcome to my personal page! I’m Raphaël Romero, a PhD student in computer science and statistics, in the <a href="https://aida.ugent.be/">AIDA group</a> of Ghent University and IDlab. On this website I post articles summarizing research ideas, as well as miscellaneous technical content.</p>
-
-<h2 id="about">About</h2>
-
-<p>I work under the supervision of professor Tijl De Bie on graph embedding and longitudinal network modelling using survival analysis.</p>
-
-<p>Previously I worked one year as a Data Scientist at <a href="https://www.shift-technology.com/fr/">Shift Technology</a> in Paris and interned 6 month in the Paris-based start-up <a href="https://jalgos.com/">Jalgos AI</a>.</p>
-
-<p>Before that I completed a Msc in Mathematics, Computer Vision and Machine learning at ENS Paris-Saclay (former ENS Cachan), as well as a MEng at Telecom Paris.</p>
-
-<p>Please click <a href="https://github.com/rapharomero/resume/raw/master/cv_phd.pdf">here</a> to access my updated Curriculum Vitae.</p>
-
-<h2 id="list-of-publications">List of Publications</h2>
-
-<ul>
-  <li>Romero, R., Kang, B., &amp; De Bie, T. (2022). Graph-Survival: A Survival Analysis Framework for Machine Learning on Temporal Network. 1–13. Under Review. <a href="http://arxiv.org/abs/2203.07260">arxiv</a>
-</li>
-</ul>
-
-
-
-    </article>
-    <span class="print-footer">Home - raphael romero</span>
-    <footer>
-  <hr class="slender">
-  <ul class="footer-links">
-    <li><a href="mailto:hate@spam.net"><span class="icon-mail3"></span></a></li>    
-    
-      <li>
-        <a href="//www.twitter.com/twitter_handle"><span class="icon-twitter"></span></a>
-      </li>
-    
-      <li>
-        <a href="//plus.google.com/+googlePlusName"><span class="icon-google2"></span></a>
-      </li>
-    
-      <li>
-        <a href="//github.com/GithubHandle"><span class="icon-github"></span></a>
-      </li>
-    
-      <li>
-        <a href="//www.flickr.com/photos/FlickrUserID"><span class="icon-flickr3"></span></a>
-      </li>
-    
-      <li>
-        <a href="/feed"><span class="icon-rss2"></span></a>
-      </li>
-    
-      <li>
-        <a href="//vimeo.com/vimeo-id"><span class="icon-vimeo2"></span></a>
-      </li>
-    
-      <li>
-        <a href="//www.linkedin.com/"><span class="icon-linkedin"></span></a>
-      </li>
-      
-  </ul>
-<div class="credits">
-<span>© 2022   RAPHAEL ROMERO</span> <br>
-<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for Content-centric blogging </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
-</div>  
-</footer>
-  </body>
+        <p>
+          Before my PhD, I completed a Master of Engineering at <a href="https://www.telecom-paris.fr/" class="link-dark">Télécom Paris</a> and the Master of Science <a href="https://www.master-mva.com/" class="link-dark">MVA</a> (Mathematics, Computer Vision, Machine Learning) at <a href="https://ens-paris-saclay.fr/" class="link-dark">ENS Paris-Saclay</a>. I then worked for one year as a data scientist at <a href="https://www.shift-technology.com/fr/" class="link-dark">Shift Technology</a> in Paris.
+        </p>  
+        <h3 class="mt-5">Publications and preprints</h3>
+        <ul class="list-unstyled publications">
+          <li>
+            <p><a href="https://proceedings.mlr.press/v337/perez26a.html" class="link-dark">How predicted links influence network evolution: disentangling choice and algorithmic feedback in dynamic graphs</a></p>
+            <p class="publication-authors">(2026). M. Pérez, <b>R. Romero</b>, J. Lijffijt, C. Laclau. <i>Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence (UAI 2026), PMLR 337:5374–5392</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://www.nature.com/articles/s44387-025-00048-0" class="link-dark">Large language models reflect the ideology of their creators</a></p>
+            <p class="publication-authors">(2026). M. Buyl, A. Rogiers, S. Noels, G. Bied, I. Domínguez-Catena, E. Heiter, I. Johary, A. C. Mara, <b>R. Romero</b>, J. Lijffijt, T. De Bie. <i>npj Artificial Intelligence 2(1), 7</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://arxiv.org/abs/2506.01208" class="link-dark">Multiresolution analysis and statistical thresholding on dynamic networks</a></p>
+            <p class="publication-authors">(2025). <b>R. Romero</b>, T. De Bie, N. Heard, A. Modell. <i>Advances in Neural Information Processing Systems 38 (NeurIPS 2025)</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://arxiv.org/abs/2505.07653" class="link-dark">JobHop: a large-scale dataset of career trajectories</a></p>
+            <p class="publication-authors">(2025). I. Johary, <b>R. Romero</b>, A. C. Mara, T. De Bie. <i>2025 IEEE International Conference on Big Data (BigData)</i>, pp. 2184–2191.</p>
+          </li>
+          <li>
+            <p><a href="https://doi.org/10.1007/s10618-025-01119-1" class="link-dark">SimHawNet: a modified Hawkes process for temporal network simulation</a></p>
+            <p class="publication-authors">(2025). M. Pérez, <b>R. Romero</b>, B. Kang, T. De Bie, J. Lijffijt, C. Laclau. <i>Data Mining and Knowledge Discovery 39(5), 48</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://neurips.cc/virtual/2025/127685" class="link-dark">Temporal graph autoencoder: mapping dynamic graphs to dynamical systems with neural ODEs</a></p>
+            <p class="publication-authors">(2025). <b>R. Romero</b>, R. Daems, T. De Bie. <i>New Perspectives in Graph Machine Learning Workshop @ NeurIPS 2025</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://ecml-aaltd.github.io/aaltd2025/articles/Romero-61%5CCameraReady%5Cmain.pdf" class="link-dark">Characterizing bird movement using spectral clustering</a></p>
+            <p class="publication-authors">(2025). <b>R. Romero</b>, L. Mitchell, F. Verbruggen, L. Lens, J. Lijffijt. <i>10th Workshop on Advanced Analytics and Learning on Temporal Data (AALTD 2025) @ ECML-PKDD 2025, Porto</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://link.springer.com/chapter/10.1007/978-3-032-15165-0_5" class="link-dark">Next-event prediction in soccer: assessing the impact of team and player information</a></p>
+            <p class="publication-authors">(2025). <b>R. Romero</b>, Y. Mashayekhi, F. Lai, M. Van Roy, T. De Bie, J. Davis. <i>12th Workshop on Machine Learning and Data Mining for Sports Analytics @ ECML-PKDD 2025, Porto</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://doi.org/10.3390/app14083516" class="link-dark">Exploring the performance of continuous-time dynamic link prediction algorithms</a></p>
+            <p class="publication-authors">(2024). <b>R. Romero</b>, M. Buyl, T. De Bie, J. Lijffijt. <i>Applied Sciences 14(8), 3516</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://biblio.ugent.be/publication/01JD2CTSWYWVFR3541W4NB3CFD" class="link-dark">Modeling weighted and temporal graphs: methods and evaluation</a></p>
+            <p class="publication-authors">(2024). <b>R. Romero</b>. <i>PhD thesis, Ghent University</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://doi.org/10.1109/ACCESS.2023.3324213" class="link-dark">Gaussian embedding of temporal networks</a></p>
+            <p class="publication-authors">(2023). <b>R. Romero</b>, J. Lijffijt, R. Rastelli, M. Corneli, T. De Bie. <i>IEEE Access 11, 117971–117983</i>.</p>
+          </li>
+          <li>
+            <p><a href="https://www.esann.org/sites/default/files/proceedings/2022/ES2022-28.pdf" class="link-dark">Embedding-based next song recommendation for playlists</a></p>
+            <p class="publication-authors">(2022). <b>R. Romero</b>, T. De Bie. <i>European Symposium on Artificial Neural Networks (ESANN 2022)</i>.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
 </html>
